@@ -1,0 +1,242 @@
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@300&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+</head>
+
+<body style="overflow-x: hidden;width: 100%; height: 100%;background-color: #c3c3c3;font-family: 'Inconsolata', monospace;">
+    <div style="text-align: center;width: 100%;">
+        <div style="text-align: center;background: white;width: 50%;display: inline-block;padding: 15px;">
+            <h1>Api geoMeli </h1>
+            <div >
+                <div id="divError" style="display:none;padding:5px;background: rgb(255, 122, 122);color:rgb(51, 35, 35);margin-bottom: 20px;"> 
+                    
+                </div>
+                <div id="divSearching" style="display:none;padding:5px;background: rgb(255, 255, 122);color:rgb(51, 35, 35);margin-bottom: 20px;"> 
+                        Buscando Datos...
+                </div>
+                <input type="text" id="ipAddress" maxlength="15" placeholder="Ingrese la dirección IP">
+                <input id="btnSubmit" type="button" value="Solicitar Datos" onclick="generateRequest();" ></button>
+            </div>
+            <div id="divResult" style="display: none;">
+                <div style="width:100%;text-align: center;margin-top: 20px;">
+                    <div style="width:300px;display:inline-block;text-align: left;">
+                        <div style="text-align: center;">
+                            <img id="imagen" src="" alt="" style="display:inline-block; width: 200px;height: 120px">
+                        </div>
+                        <div style="margin-top: 20px;">
+                            <div>
+                                <label>IP: </label>
+                                <label id="ip" style="font-weight: bold;"></label>
+                            </div>
+                            <div>
+                                <label>País: </label>
+                                <label id="name" style="font-weight: bold;"></label>
+                            </div>
+                            <div>
+                                <label>Capital: </label>
+                                <label id="capital" style="font-weight: bold;"></label>
+                            </div>
+                            <div>
+                                <label>ISO Code: </label>
+                                <label id="IsoCode" style="font-weight: bold;"></label>
+                            </div>
+                            <div>
+                                <label>Idiomas: </label>
+                                <label id="idiomas" style="font-weight: bold;"></label>
+                            </div>
+
+                            <div>
+                                <label>Moneda: </label>
+                                <label id="monedas" style="font-weight: bold;"></label>
+                            </div>
+
+                            <div>
+                                <label>Cotización: </label>
+                                <label id="cotizacion" style="font-weight: bold;"></label>
+                            </div>
+
+                            <div>
+                                <label>Hora: </label>
+                                <label id="hora" style="font-weight: bold;"></label>
+                            </div>
+
+                            <div>
+                                <label>Distancia estimada: </label>
+                                <label id="distancia" style="font-weight: bold;"></label>
+                            </div>
+                            <!-- País: España (spain)
+                            ISO Code: es
+                            Idiomas: Español (es)
+                            Moneda: EUR (1 EUR = 1.0631 U$S)
+                            Hora: 20:01:23 (UTC) o 21:01:23 (UTC+01:00)
+                            Distancia estimada: 10270 kms (-34, -64) a (40, -4) -->
+                        </div>
+                    </div>
+                </div>
+                <div id="map" style="height: 200px;margin-top: 20px;"></div>
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+
+    var map = L.map('map',{zoomControl:false,scrollWheelZoom:false});
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    var marker;
+    function ValidateIPaddress(ipaddress) {
+        return (/^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(ipaddress));
+    }
+
+    function generateRequest() {
+        if (ValidateIPaddress(document.getElementById("ipAddress").value)) {
+            sendRequest();
+        } else {
+            alert("La dirección IP ingresada es incorrecta, verifique.")
+        }
+    }
+
+    getKilometros = function (lat2, lon2) {
+        var lat1 = -34;
+        var lon1 = -64;
+        rad = function (x) { return x * Math.PI / 180; }
+        var R = 6378.137; //Radio de la tierra en km
+        var dLat = rad(lat2 - lat1);
+        var dLong = rad(lon2 - lon1);
+        var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(rad(lat1)) * Math.cos(rad(lat2)) * Math.sin(dLong / 2) * Math.sin(dLong / 2);
+        var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        var d = R * c;
+
+        return Math.round(d.toFixed(3)); //Retorna tres decimales
+    }
+    function clearData(){
+        document.getElementById("ip").innerHTML = "";
+        document.getElementById("name").innerHTML = "";
+        document.getElementById("capital").innerHTML = "";
+        document.getElementById("imagen").src = "";
+        document.getElementById("IsoCode").innerHTML = "";
+        document.getElementById("idiomas").innerHTML = "";
+        document.getElementById("monedas").innerHTML = "";
+        document.getElementById("cotizacion").innerHTML = "";
+        document.getElementById("hora").innerHTML = "";
+        document.getElementById("distancia").innerHTML = "";
+    }
+
+    function sendRequest() {
+        clearData();
+        setLoading(true);
+        $.ajax({
+            "url": "http://localhost:8080/api",
+            "method": "POST",
+            "timeout": 0,
+            dataType: "json",
+            "headers": {
+                "Content-Type": "application/javascript"
+            },
+            "data": document.getElementById("ipAddress").value,
+            success: function (data) {
+                console.log(data);
+                if(!data.success){
+                    showRequestError(data.message);
+                    return;
+                }
+                setLoading(false);
+
+                var res = data.ip.country;
+                document.getElementById("ip").innerHTML = data.ip.ip;
+                document.getElementById("name").innerHTML = res.name;
+                document.getElementById("capital").innerHTML = res.capital;
+                document.getElementById("imagen").src = res.flag;
+                document.getElementById("IsoCode").innerHTML = res.alpha2Code;
+
+                var lan = "";
+                Array.from(res.languages).map((language, index) => {
+                    if (index > 0)
+                        lan += ", ";
+
+                    lan += `${language.name} (${language.iso639_1})`;
+                })
+                document.getElementById("idiomas").innerHTML = lan;
+
+                var mon = "";
+                var cot = "";
+                Array.from(res.currencies).map((moneda, index) => {
+                    if (index > 0){
+                        mon += ", ";
+                        if(cot != "")
+                            cot += ", ";
+                    }
+
+                    mon += `${moneda.symbol} (${moneda.code} - ${moneda.name})`;
+                    if(moneda.priceUSD > 0){
+                        cot += `1 ${moneda.code} = ${moneda.priceUSD.toFixed(2)} USD`;
+                    }else{
+                        cot += `${moneda.code} sin cotización`;
+                    }
+                })
+                document.getElementById("monedas").innerHTML = mon;
+                document.getElementById("cotizacion").innerHTML = cot;
+
+                var hor = "";
+                Array.from(res.timezones).map((hora, index) => {
+                    if (index > 0)
+                        hor += ", ";
+
+                    hor += `${hora}`;
+                })
+                document.getElementById("hora").innerHTML = hor;
+                if(marker != undefined){
+                    marker.remove();
+                }
+
+                document.getElementById("distancia").innerHTML = `${getKilometros(res.latlng[0], res.latlng[1])} kms. `;
+                marker = L.marker([res.latlng[0], res.latlng[1]]).addTo(map)
+                    .bindPopup('Aquí es <b>' + res.name + '</b>')
+                    .openPopup();
+                
+                map.setView([res.latlng[0], res.latlng[1]], 3)
+            },
+            error: function (err) {
+                showRequestError("Ocurrió un problema, vuelva a intentarlo.");
+                console.log(err);
+            }
+        })
+    }
+
+    function setLoading(visible){
+        if(visible){
+        document.getElementById('divError').style.display = "none";
+            document.getElementById('divSearching').style.display = "";
+            document.getElementById('divResult').style.display = "none";
+            document.getElementById('btnSubmit').disabled = true;
+        }else{
+        document.getElementById('divError').style.display = "none";
+            document.getElementById('divSearching').style.display = "none";
+            document.getElementById('divResult').style.display = "";
+            document.getElementById('btnSubmit').disabled = false;
+        }
+    }
+
+    function showRequestError(msg){
+        document.getElementById('divError').style.display = "";
+        document.getElementById('divError').innerText = msg;
+        document.getElementById('divSearching').style.display = "none";
+        document.getElementById('btnSubmit').disabled = false;
+
+    }
+
+    function searching(){
+
+    }
+
+</script>
+
+</html>

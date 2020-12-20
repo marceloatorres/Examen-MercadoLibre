@@ -176,8 +176,8 @@
                     }
 
                     mon += `${moneda.symbol} (${moneda.code} - ${moneda.name})`;
-                    if(moneda.priceUSD > 0){
-                        cot += `1 ${moneda.code} = ${moneda.priceUSD.toFixed(2)} USD`;
+                    if(moneda.exchangeRate.rate > 0){
+                        cot += `1 ${moneda.code} = ${moneda.exchangeRate.rate.toFixed(2)} USD`;
                     }else{
                         cot += `${moneda.code} sin cotización`;
                     }
@@ -190,7 +190,7 @@
                     if (index > 0)
                         hor += ", ";
 
-                    hor += `${hora}`;
+                    hor += `${hora.timeZone}`;
                 })
                 document.getElementById("hora").innerHTML = hor;
                 if(marker != undefined){

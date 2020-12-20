@@ -1,12 +1,9 @@
 package utils;
 
+import utils.Configuration.UrlAPI;
+
 public class ExternalApi {
-	public enum UrlAPI {
-		  IP,
-		  COUNTRY,
-		  RATE
-		}
-	
+
 	private String url;
 	
 	public ExternalApi(UrlAPI url) {
@@ -20,7 +17,7 @@ public class ExternalApi {
 		case COUNTRY:
 			return "https://restcountries.eu/rest/v2/alpha/";
 		case RATE:
-			return "http://data.fixer.io/api/latest?access_key=86bda81848f4b198301d4391c3a80227&symbols=USD,";
+			return "http://data.fixer.io/api/latest?access_key=86bda81848f4b198301d4391c3a80227&symbols=" + Configuration.CODERATETOEXCHANGE + ",";
 		default:
 			return "";
 		}

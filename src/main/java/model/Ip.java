@@ -1,5 +1,9 @@
 package model;
 
+import java.util.regex.Pattern;
+
+import utils.Configuration;
+
 public class Ip {
 	private String ip;
 	private Country country;
@@ -26,4 +30,9 @@ public class Ip {
 		this.country = country;
 	}
 	
+	public static boolean isValid(String ipAddress) {
+		String IP_REGEXP = Configuration.REGEX_IP_ADDRESS;
+		Pattern IP_PATTERN = Pattern.compile(IP_REGEXP);
+		return IP_PATTERN.matcher(ipAddress).matches();
+	}
 }

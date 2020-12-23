@@ -16,7 +16,6 @@ import model.Ip;
 import model.Response;
 import service.ICountryService;
 import utils.ExternalApi;
-import utils.IpAddressValidator;
 import utils.Configuration;
 import utils.Configuration.UrlAPI;
 
@@ -35,7 +34,7 @@ public class CountryController {
 	
 	@PostMapping("/info")
 	public String getRequest(@RequestBody String ipAddress) throws Exception {
-		if(!IpAddressValidator.isValid(ipAddress)) {
+		if(!Ip.isValid(ipAddress)) {
 			response = new Response(false,"El ip ingresado es incorrecto",null);
 			return objectMapper.writeValueAsString(response);
 		}

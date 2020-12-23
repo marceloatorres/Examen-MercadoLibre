@@ -79,7 +79,7 @@
                     document.getElementById("lblDistanceAverage").innerHTML = `${data} km.`;
 
                 }, error: function (err) {
-
+                    document.getElementById("lblDistanceAverage").innerHTML = "No encontrado";
                 }
             })
         }
@@ -93,19 +93,10 @@
                 headers: {
                     "Content-Type": "application/javascript"
                 },
-                success: function (data) {
-                    var strCountriesMinDistance = "";
-                    Array.from(data).map((country, index) => {
-                        if(index > 0)
-                        strCountriesMinDistance += "<br> "
-
-                        strCountriesMinDistance += `${country.name} (${country.distanceToArgentina} km.)`;
-                    })
-
-                    document.getElementById("lblMinDistance").innerHTML = strCountriesMinDistance;
-
+                success: function (country) {
+                    document.getElementById("lblMinDistance").innerHTML = `${country.name} (${country.distanceToArgentina} km.)`;
                 }, error: function (err) {
-
+                    document.getElementById("lblMinDistance").innerHTML = "No encontrado";
                 }
             })
         }
@@ -119,19 +110,10 @@
                 headers: {
                     "Content-Type": "application/javascript"
                 },
-                success: function (data) {
-                    var strCountriesMaxDistance = "";
-                    Array.from(data).map((country, index) => {
-                        if(index > 0)
-                            strCountriesMaxDistance += "<br> "
-
-                        strCountriesMaxDistance += `${country.name} (${country.distanceToArgentina} km.)`;
-                    })
-
-                    document.getElementById("lblMaxDistance").innerHTML = strCountriesMaxDistance;
-
+                success: function (country) {
+                    document.getElementById("lblMaxDistance").innerHTML = `${country.name} (${country.distanceToArgentina} km.)`;
                 }, error: function (err) {
-
+                    document.getElementById("lblMaxDistance").innerHTML = "No encontrado";
                 }
             })
         }

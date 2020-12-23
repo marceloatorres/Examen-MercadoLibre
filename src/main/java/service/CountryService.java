@@ -1,12 +1,15 @@
 package service;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.Semaphore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import model.Country;
 import repository.CountryRepository;
+import repository.SingletonCountry;
 
 @Service
 public class CountryService implements ICountryService {
@@ -14,12 +17,28 @@ public class CountryService implements ICountryService {
 	@Autowired
 	private CountryRepository countryRepository;
 	
+	private Semaphore semaphoreAllCountries = new Semaphore(1);
+	private Semaphore semaphoreMaxDistance = new Semaphore(2);
+	private Semaphore semaphoreMinDistance = new Semaphore(3);
+	private Semaphore semaphoreAverage = new Semaphore(4);
 	
 	@Override
 	@Async
 	public List<Country> getAllCountries() {
-		return countryRepository.findAll(Sort.by(Sort.Direction.DESC, "requestCount"));
+		SingletonCountry singletonCountry = SingletonCountry.getSingletonCountry();
+		if(singletonCountry.getAllCountries() == null || singletonCountry.shouldUpdate(singletonCountry.getLastUpdateAllCountries())) {
+			try {
+				semaphoreAllCountries.acquire();
+				singletonCountry.setAllCountries(countryRepository.findAll(Sort.by(Sort.Direction.DESC, "requestCount")));
+				singletonCountry.calculateAll();
+				semaphoreAllCountries.release();
+			} catch (InterruptedException e) {
+				return null;
+			}
+		}
+		return singletonCountry.getAllCountries();
 	}
+
 
 	@Override
 	public Country saveCountry(Country country) {
@@ -31,33 +50,65 @@ public class CountryService implements ICountryService {
 			Country updatedCountry = new Country();
 				Country country = new Country();
 				country = countryRepository.findById(code1).orElse(null);
-				
 				if(country == null) {
 					return null;
 				}
-				
 				country.increaseRequestCount();
 				updatedCountry = countryRepository.save(country);
-				
 			return updatedCountry;
 	}
 
 	@Override
 	@Async
-	public List<Country> getMax() {
-		return countryRepository.findMax();
+	public Country getMax() {
+		SingletonCountry singletonCountry = SingletonCountry.getSingletonCountry();
+		if(singletonCountry.getMaxDistanceCountry() == null || singletonCountry.shouldUpdate(singletonCountry.getLastUpdateMaxDistance())) {
+			try {
+				semaphoreMaxDistance.acquire();
+				singletonCountry.setMaxDistanceCountry(countryRepository.findMax());
+				singletonCountry.setLastUpdateMaxDistance(LocalDateTime.now());
+				semaphoreMaxDistance.release();
+			} catch (InterruptedException e) {
+				return null;
+			}
+		}
+		
+		return singletonCountry.getMaxDistanceCountry();
 	}
 	
 	@Override
 	@Async
-	public List<Country> getMin() {
-		return countryRepository.findMin();
+	public Country getMin() {
+		SingletonCountry singletonCountry = SingletonCountry.getSingletonCountry();
+		if(singletonCountry.getMinDistanceCountry() == null || singletonCountry.shouldUpdate(singletonCountry.getLastUpdateMinDistance())) {
+			try {
+				semaphoreMinDistance.acquire();
+				singletonCountry.setMinDistanceCountry(countryRepository.findMin());
+				singletonCountry.setLastUpdateMinDistance(LocalDateTime.now());
+				semaphoreMinDistance.release();
+			} catch (InterruptedException e) {
+				return null;
+			}
+		}
+		
+		return singletonCountry.getMinDistanceCountry();
 	}
 	
 	@Override
 	@Async
 	public long distanceAverage(){
-		return countryRepository.distanceAverage();
+		SingletonCountry singletonCountry = SingletonCountry.getSingletonCountry();
+		if(singletonCountry.getAverageDistanceCountries() == 0 || singletonCountry.shouldUpdate(singletonCountry.getLastUpdateAverage())) {
+			try {
+				semaphoreAverage.acquire();
+				singletonCountry.setAverageDistanceCountries(countryRepository.distanceAverage());
+				singletonCountry.setLastUpdateAverage(LocalDateTime.now());
+				semaphoreAverage.release();
+			} catch (InterruptedException e) {
+				return 0;
+			}
+		}
+		return singletonCountry.getAverageDistanceCountries();
 	}
 	
 }

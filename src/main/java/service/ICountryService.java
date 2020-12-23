@@ -7,7 +7,7 @@ public interface ICountryService {
 	List<Country> getAllCountries();
 	Country saveCountry(Country country);
 	Country updateCountry(String code1);
-	List<Country> getMax() ;
-	List<Country> getMin() ;
+	Country getMax() ;
+	Country getMin() ;
 	long distanceAverage();
 }

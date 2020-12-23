@@ -8,14 +8,11 @@ import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
 import org.springframework.boot.configurationprocessor.json.JSONArray;
 import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
 import com.google.gson.Gson;
-
 import utils.Configuration;
 @Entity
 @Table(name = "countries")
@@ -217,6 +214,10 @@ public class Country {
 	    float dist = (float) (earthRadius * c);
 
 	    this.distanceToArgentina = (int)dist;
+	}
+	
+	public int calcToAverage() {
+		return this.distanceToArgentina * this.requestCount;
 	}
 	
 }

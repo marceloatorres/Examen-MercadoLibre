@@ -30,7 +30,6 @@
         }
 
         #divError {
-            display: none;
             padding: 5px;
             background: rgb(255, 122, 122);
             color: rgb(51, 35, 35);
@@ -38,7 +37,6 @@
         }
 
         #divSearching {
-            display: none;
             padding: 5px;
             background: rgb(255, 255, 122);
             color: rgb(51, 35, 35);
@@ -66,8 +64,8 @@
         <div class="panelData">
             <h1>Api geoMeli </h1>
             <div>
-                <div id="divError"></div>
-                <div id="divSearching">Buscando Datos...</div>
+                <div id="divError" style="display: none;"></div>
+                <div id="divSearching" style="display: none;">Buscando Datos...</div>
                 <input type="text" id="ipAddress" maxlength="15" placeholder="Ingrese la dirección IP">
                 <input id="btnSubmit" type="button" value="Solicitar datos" onclick="generateRequest();"></button><br>
                 <input id="btnStats" type="button" value="Ver estadística"

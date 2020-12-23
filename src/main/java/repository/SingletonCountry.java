@@ -124,10 +124,16 @@ public class SingletonCountry {
 	}
 	
 	public void calcAverage() {
-		this.setAverageDistanceCountries((long)this.getAllCountries()
-	            .stream()
-	            .mapToDouble(Country::calcToAverage)
-	            .average().getAsDouble());
+		long TotalSum =	(long)this.getAllCountries()
+			            .stream()
+			            .mapToInt(Country::calcToAverage)
+			            .sum() ;
+		
+		long totalRequestCount = (long)this.getAllCountries()
+					            .stream()
+					            .mapToInt(Country::getRequestCount)
+					            .sum();
+		this.setAverageDistanceCountries(TotalSum / totalRequestCount);
 	}
 	
 	public void calculateAll() {

@@ -12,56 +12,118 @@
     <script src="https://code.highcharts.com/modules/accessibility.js"></script>
 
     <style>
-        
+        body {
+            overflow-x: hidden;
+            width: 100%;
+            height: 100%;
+            background-color: #c3c3c3;
+            font-family: 'Inconsolata', monospace;
+        }
+
+        .container {
+            text-align: center;
+            width: 100%;
+        }
+
+        .panelData {
+            text-align: center;
+            background: white;
+            width: 50%;
+            display: inline-block;
+            padding: 15px;
+        }
+
+        #divError {
+            display: none;
+            padding: 5px;
+            background: rgb(255, 122, 122);
+            color: rgb(51, 35, 35);
+            margin-bottom: 20px;
+        }
+
+        #divSearching {
+            display: none;
+            padding: 5px;
+            background: rgb(255, 255, 122);
+            color: rgb(51, 35, 35);
+            margin-bottom: 20px;
+        }
+
+        #btnBack {
+            background: rgb(232, 255, 100);
+        }
+
+        #divContainerMinDistance {
+            display: inline-block;
+            margin-left: 10px;
+            background: #fbda94;
+            padding: 10px;
+            margin: 5px;
+        }
+
+        #divContainerMaxDistance {
+            display: inline-block;
+            margin-left: 10px;
+            background: #a5ccff;
+            padding: 10px;
+            margin: 5px;
+        }
+
+        #divContainerAverageDistance {
+            display: inline-block;
+            margin-left: 10px;
+            background: #f9fb94;
+            padding: 10px;
+            margin: 5px;
+        }
+
+        .bold {
+            font-weight: bold;
+        }
     </style>
 
 </head>
 
-<body
-    style="overflow-x: hidden;width: 100%; height: 100%;background-color: #c3c3c3;font-family: 'Inconsolata', monospace;">
-    <div style="text-align: center;width: 100%;">
-        <div style="text-align: center;background: white;width: 50%;display: inline-block;padding: 15px;">
+<body>
+    <div class="container">
+        <div class="panelData">
             <h1>Estadística - Api geoMeli </h1>
             <div>
-                <div id="divError"
-                    style="display:none;padding:5px;background: rgb(255, 122, 122);color:rgb(51, 35, 35);margin-bottom: 20px;">
+                <div id="divError">
                 </div>
-                <div id="divSearching"
-                    style="display:none;padding:5px;background: rgb(255, 255, 122);color:rgb(51, 35, 35);margin-bottom: 20px;">
+                <div id="divSearching">
                     Buscando Datos...
                 </div>
-                <input id="btnBack" type="button" value="volver" onclick="window.location.assign('/');" style="background: rgb(232, 255, 100);"></button>
+                <input id="btnBack" type="button" value="volver" onclick="window.location.assign('/');"></button>
                 <input id="btnSubmit" type="button" value="Actualizar estadística" onclick="loadAllStats();"></button>
             </div>
             <figure class="highcharts-figure">
                 <div id="container"></div>
-
-            <div style="width: 100%;">
-                <div id="divContainerMinDistance"  style="display: inline-block;margin-left: 10px;background: #fbda94;padding: 10px;margin:5px;">
-                    <div>País con mínima distancia</div>
-                    <label id="lblMinDistance" style="font-weight: bold;"></label>
+                <div style="width: 100%;">
+                    <div id="divContainerMinDistance">
+                        <div>País con mínima distancia</div>
+                        <label id="lblMinDistance" class="bold"></label>
+                    </div>
+                    <div id="divContainerMaxDistance">
+                        <div>País con máxima distancia</div>
+                        <label id="lblMaxDistance" class="bold"></label>
+                    </div>
+                    <div id="divContainerAverageDistance">
+                        <div>Promedio de distancias</div>
+                        <label id="lblDistanceAverage" class="bold"></label>
+                    </div>
                 </div>
-                <div id="divContainerMaxDistance" style="display: inline-block;margin-left: 10px;background: #a5ccff;padding: 10px;margin:5px;"> 
-                    <div>País con máxima distancia</div>
-                    <label id="lblMaxDistance" style="font-weight: bold;"></label>
-                </div>
-                <div id="divContainerMinDistance"  style="display: inline-block;margin-left: 10px;background: #f9fb94;padding: 10px;margin:5px;">
-                    <div>Promedio de distancias</div>
-                    <label id="lblDistanceAverage" style="font-weight: bold;"></label>
-                </div>
-            </div>
-
             </figure>
         </div>
     </div>
     <script>
 
-        $(document).ready(function(){
+        $(document).ready(function () {
             loadAllStats();
         })
 
-        function loadAllStats(){
-            getCountryMinDistance() 
+        function loadAllStats() {
+            getCountryMinDistance()
             getCountryMaxDistance();
             getDistanceAverage();
             generateStatistic();
@@ -118,7 +180,6 @@
             })
         }
 
-        
         function generateStatistic() {
             $.ajax({
                 url: "http://localhost:8082/api/stats",
@@ -147,60 +208,59 @@
 
         function char(var_series) {
             Highcharts.chart('container', {
-    chart: {
-        type: 'column'
-    },
-    title: {
-        text: 'Ranking de request por paises'
-    },
-    subtitle: {
-        text: ''
-    },
-    accessibility: {
-        announceNewData: {
-            enabled: true
-        }
-    },
-    xAxis: {
-        type: 'category'
-    },
-    yAxis: {
-        title: {
-            text: 'Cantidad'
-        }
+                chart: {
+                    type: 'column'
+                },
+                title: {
+                    text: 'Ranking de request por paises'
+                },
+                subtitle: {
+                    text: ''
+                },
+                accessibility: {
+                    announceNewData: {
+                        enabled: true
+                    }
+                },
+                xAxis: {
+                    type: 'category'
+                },
+                yAxis: {
+                    title: {
+                        text: 'Cantidad'
+                    }
+                },
+                legend: {
+                    enabled: false
+                },
+                exporting: {
+                    enabled: false
+                },
+                credits: {
+                    enabled: false
+                },
+                plotOptions: {
+                    series: {
+                        borderWidth: 0,
+                        dataLabels: {
+                            enabled: true,
+                            format: '{point.y}'
+                        }
+                    }
+                },
 
-    },
-    legend: {
-        enabled: false
-    },
-    exporting: {
-         enabled: false
-},
-credits: {
-     enabled: false
-},
-    plotOptions: {
-        series: {
-            borderWidth: 0,
-            dataLabels: {
-                enabled: true,
-                format: '{point.y}'
-            }
-        }
-    },
+                tooltip: {
+                    pointFormat: '<b>{point.y}</b> ip request<br/>'
+                },
 
-    tooltip: {
-        pointFormat: '<b>{point.y}</b> ip request<br/>'
-    },
-
-    series: [
-        {
-            colorByPoint: true,
-            data: 
-              var_series
-        }
-    ]
-});
+                series: [
+                    {
+                        colorByPoint: true,
+                        data:
+                            var_series
+                    }
+                ]
+            });
         }
     </script>
 </body>

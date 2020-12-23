@@ -8,83 +8,130 @@
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
 
     <style>
+        body {
+            overflow-x: hidden;
+            width: 100%;
+            height: 100%;
+            background-color: #c3c3c3;
+            font-family: 'Inconsolata', monospace;
+        }
 
+        .container {
+            text-align: center;
+            width: 100%;
+        }
+
+        .panelData {
+            text-align: center;
+            background: white;
+            width: 70%;
+            display: inline-block;
+            padding: 15px;
+        }
+
+        #divError {
+            display: none;
+            padding: 5px;
+            background: rgb(255, 122, 122);
+            color: rgb(51, 35, 35);
+            margin-bottom: 20px;
+        }
+
+        #divSearching {
+            display: none;
+            padding: 5px;
+            background: rgb(255, 255, 122);
+            color: rgb(51, 35, 35);
+            margin-bottom: 20px;
+        }
+
+        #btnStats {
+            margin-top: 10px;
+            background: rgb(100, 255, 139);
+        }
+
+        .bold {
+            font-weight: bold;
+        }
+
+        #map {
+            height: 200px;
+            margin-top: 20px;
+        }
     </style>
 </head>
 
-<body style="overflow-x: hidden;width: 100%; height: 100%;background-color: #c3c3c3;font-family: 'Inconsolata', monospace;">
-    <div style="text-align: center;width: 100%;">
-        <div style="text-align: center;background: white;width: 70%;display: inline-block;padding: 15px;">
+<body>
+    <div class="container">
+        <div class="panelData">
             <h1>Api geoMeli </h1>
-            <div >
-                <div id="divError" style="display:none;padding:5px;background: rgb(255, 122, 122);color:rgb(51, 35, 35);margin-bottom: 20px;"> 
-                    
-                </div>
-                <div id="divSearching" style="display:none;padding:5px;background: rgb(255, 255, 122);color:rgb(51, 35, 35);margin-bottom: 20px;"> 
-                        Buscando Datos...
-                </div>
+            <div>
+                <div id="divError"></div>
+                <div id="divSearching">Buscando Datos...</div>
                 <input type="text" id="ipAddress" maxlength="15" placeholder="Ingrese la dirección IP">
-                <input id="btnSubmit" type="button" value="Solicitar datos" onclick="generateRequest();" ></button><br>
-                <input id="btnStats" type="button" value="Ver estadística" onclick="window.location.assign('/stats');" style="margin-top:10px;background: rgb(100, 255, 139);"></button>
+                <input id="btnSubmit" type="button" value="Solicitar datos" onclick="generateRequest();"></button><br>
+                <input id="btnStats" type="button" value="Ver estadística"
+                    onclick="window.location.assign('/stats');"></button>
             </div>
             <div id="divResult" style="display: none;">
                 <div style="width:100%;text-align: center;margin-top: 20px;">
                     <div style="width:350px;display:inline-block;text-align: left;">
                         <div style="text-align: center;">
-                            <img id="imagen" src="" alt="" style="border:1px solid grey;display:inline-block; width: 200px;height: 120px">
+                            <img id="imagen" src="" alt=""
+                                style="border:1px solid grey;display:inline-block; width: 200px;height: 120px">
                         </div>
                         <div style="margin-top: 20px;">
                             <div>
                                 <label>IP: </label>
-                                <label id="ip" style="font-weight: bold;"></label>
+                                <label id="ip" class="bold"></label>
                             </div>
                             <div>
                                 <label>País: </label>
-                                <label id="name" style="font-weight: bold;"></label>
+                                <label id="name" class="bold"></label>
                             </div>
                             <div>
                                 <label>Capital: </label>
-                                <label id="capital" style="font-weight: bold;"></label>
+                                <label id="capital" class="bold"></label>
                             </div>
                             <div>
                                 <label>ISO Code: </label>
-                                <label id="IsoCode" style="font-weight: bold;"></label>
+                                <label id="IsoCode" class="bold"></label>
                             </div>
                             <div>
                                 <label>Idiomas: </label>
-                                <label id="idiomas" style="font-weight: bold;"></label>
+                                <label id="languages" class="bold"></label>
                             </div>
 
                             <div>
                                 <label>Moneda: </label>
-                                <label id="monedas" style="font-weight: bold;"></label>
+                                <label id="currencies" class="bold"></label>
                             </div>
 
                             <div>
                                 <label>Cotización: </label>
-                                <label id="cotizacion" style="font-weight: bold;"></label>
+                                <label id="rateExchange" class="bold"></label>
                             </div>
 
                             <div>
                                 <label>Hora: </label>
-                                <label id="hora" style="font-weight: bold;"></label>
+                                <label id="timeZone" class="bold"></label>
                             </div>
 
                             <div>
                                 <label>Distancia estimada: </label>
-                                <label id="distancia" style="font-weight: bold;"></label>
+                                <label id="distance" class="bold"></label>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div id="map" style="height: 200px;margin-top: 20px;"></div>
+                <div id="map"></div>
             </div>
         </div>
     </div>
 </body>
 <script>
 
-    var map = L.map('map',{zoomControl:false,scrollWheelZoom:false});
+    var map = L.map('map', { zoomControl: false, scrollWheelZoom: false });
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -103,17 +150,17 @@
         }
     }
 
-    function clearData(){
+    function clearData() {
         document.getElementById("ip").innerHTML = "";
         document.getElementById("name").innerHTML = "";
         document.getElementById("capital").innerHTML = "";
         document.getElementById("imagen").src = "";
         document.getElementById("IsoCode").innerHTML = "";
-        document.getElementById("idiomas").innerHTML = "";
-        document.getElementById("monedas").innerHTML = "";
-        document.getElementById("cotizacion").innerHTML = "";
-        document.getElementById("hora").innerHTML = "";
-        document.getElementById("distancia").innerHTML = "";
+        document.getElementById("languages").innerHTML = "";
+        document.getElementById("currencies").innerHTML = "";
+        document.getElementById("rateExchange").innerHTML = "";
+        document.getElementById("timeZone").innerHTML = "";
+        document.getElementById("distance").innerHTML = "";
     }
 
     function sendRequest() {
@@ -130,7 +177,7 @@
             "data": document.getElementById("ipAddress").value,
             success: function (data) {
                 console.log(data);
-                if(!data.success){
+                if (!data.success) {
                     showRequestError(data.message);
                     return;
                 }
@@ -150,44 +197,44 @@
 
                     lan += `${language.name} (${language.iso639_1})`;
                 })
-                document.getElementById("idiomas").innerHTML = lan;
+                document.getElementById("languages").innerHTML = lan;
 
                 var mon = "";
                 var cot = "";
-                Array.from(res.currencies).map((moneda, index) => {
-                    if (index > 0){
+                Array.from(res.currencies).map((currency, index) => {
+                    if (index > 0) {
                         mon += ", ";
-                        if(cot != "")
+                        if (cot != "")
                             cot += ", ";
                     }
 
-                    mon += `${moneda.symbol} (${moneda.code} - ${moneda.name})`;
-                    if(moneda.exchangeRate > 0){
-                        cot += `1 ${moneda.code} = ${moneda.exchangeRate.toFixed(2)} USD <span style='color:grey;'> al ${moneda.dateExchange} </span>`;
-                    }else{
-                        cot += `${moneda.code} sin cotización`;
+                    mon += `${currency.symbol} (${currency.code} - ${currency.name})`;
+                    if (currency.exchangeRate > 0) {
+                        cot += `1 ${currency.code} = ${currency.exchangeRate.toFixed(2)} USD <span style='color:grey;'> al ${currency.dateExchange} </span>`;
+                    } else {
+                        cot += `${currency.code} sin cotización`;
                     }
                 })
-                document.getElementById("monedas").innerHTML = mon;
-                document.getElementById("cotizacion").innerHTML = cot;
+                document.getElementById("currencies").innerHTML = mon;
+                document.getElementById("rateExchange").innerHTML = cot;
 
                 var hor = "";
-                Array.from(res.timezones).map((hora, index) => {
+                Array.from(res.timezones).map((timeZone, index) => {
                     if (index > 0)
                         hor += ", ";
 
-                    hor += `${hora}`;
+                    hor += `${timeZone}`;
                 })
-                document.getElementById("hora").innerHTML = hor;
-                if(marker != undefined){
+                document.getElementById("timeZone").innerHTML = hor;
+                if (marker != undefined) {
                     marker.remove();
                 }
 
-                document.getElementById("distancia").innerHTML = `${res.distanceToArgentina} kms. (${res.lat}, ${res.lng})`;
+                document.getElementById("distance").innerHTML = `${res.distanceToArgentina} kms. (${res.lat}, ${res.lng})`;
                 marker = L.marker([res.lat, res.lng]).addTo(map)
                     .bindPopup('Aquí es <b>' + res.name + '</b>')
                     .openPopup();
-                
+
                 map.setView([res.lat, res.lng], 3)
             },
             error: function (err) {
@@ -197,32 +244,27 @@
         })
     }
 
-    function setLoading(visible){
-        if(visible){
-        document.getElementById('divError').style.display = "none";
+    function setLoading(visible) {
+        if (visible) {
+            document.getElementById('divError').style.display = "none";
             document.getElementById('divSearching').style.display = "";
             document.getElementById('divResult').style.display = "none";
             document.getElementById('btnSubmit').disabled = true;
-        }else{
-        document.getElementById('divError').style.display = "none";
+        } else {
+            document.getElementById('divError').style.display = "none";
             document.getElementById('divSearching').style.display = "none";
             document.getElementById('divResult').style.display = "";
             document.getElementById('btnSubmit').disabled = false;
         }
     }
 
-    function showRequestError(msg){
+    function showRequestError(msg) {
         document.getElementById('divError').style.display = "";
         document.getElementById('divError').innerText = msg;
         document.getElementById('divSearching').style.display = "none";
         document.getElementById('btnSubmit').disabled = false;
 
     }
-
-    function searching(){
-
-    }
-
 </script>
 
 </html>

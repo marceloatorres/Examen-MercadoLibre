@@ -13,7 +13,7 @@ public interface CountryRepository extends JpaRepository<Country, String>{
 	@Query(value= "SELECT * FROM countries WHERE distance_to_argentina = (SELECT MIN(distance_to_argentina) FROM countries) limit 1;;", nativeQuery = true)
 	Country findMin();
 	
-	@Query(value ="select sum((distance_to_argentina * request_count))/ count(request_count) from countries;", nativeQuery = true)
+	@Query(value ="select sum((distance_to_argentina * request_count))/ sum(request_count) from countries;", nativeQuery = true)
 	long distanceAverage();
 
 }

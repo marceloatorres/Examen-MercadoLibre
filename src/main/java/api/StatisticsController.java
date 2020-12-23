@@ -11,6 +11,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import model.Country;
+import model.Response;
 import service.ICountryService;
 
 @RequestMapping("api/stats")
@@ -22,25 +23,47 @@ public class StatisticsController {
 	@Autowired
     private ObjectMapper objectMapper;
 	
+	private Response response;
+	
 	@PostMapping
 	public String getRequest() throws JsonProcessingException {
-		List<Country> countries = countryService.getAllCountries();
-		return objectMapper.writeValueAsString(countries);
+		try {
+			List<Country> countries = countryService.getAllCountries();
+			return objectMapper.writeValueAsString(countries);
+		} catch(Exception e) {
+			response = new Response(false,"Ocurrió un error obtener datos de los países", null);
+			return objectMapper.writeValueAsString(response);
+		}
 	}
 	
 
 	@PostMapping("/average")
 	public String average() throws JsonProcessingException {
-		return objectMapper.writeValueAsString(countryService.distanceAverage());
+		try {
+			return objectMapper.writeValueAsString(countryService.distanceAverage());
+		}catch(Exception e) {
+			response = new Response(false,"Ocurrió un error obtener el promedio de distancias", null);
+			return objectMapper.writeValueAsString(response);
+		}
 	}
 	
 	@PostMapping("/max")
 	public String max() throws JsonProcessingException {
-		return objectMapper.writeValueAsString(countryService.getMax());
+		try {
+			return objectMapper.writeValueAsString(countryService.getMax());
+		}catch(Exception e){
+			response = new Response(false,"Ocurrió un error obtener el país con máxima distancia", null);
+			return objectMapper.writeValueAsString(response);	
+		}
 	}
 	
 	@PostMapping("/min")
 	public String min() throws JsonProcessingException {
-		return objectMapper.writeValueAsString(countryService.getMin());
+		try {
+			return objectMapper.writeValueAsString(countryService.getMin());
+		}catch(Exception e){
+			response = new Response(false,"Ocurrió un error obtener el país con mínima distancia", null);
+			return objectMapper.writeValueAsString(response);	
+		}
 	}
 }

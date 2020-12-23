@@ -1,0 +1,226 @@
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@300&display=swap" rel="stylesheet">
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/modules/data.js"></script>
+    <script src="https://code.highcharts.com/modules/drilldown.js"></script>
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
+    <script src="https://code.highcharts.com/modules/export-data.js"></script>
+    <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+
+    <style>
+        
+    </style>
+
+</head>
+
+<body
+    style="overflow-x: hidden;width: 100%; height: 100%;background-color: #c3c3c3;font-family: 'Inconsolata', monospace;">
+    <div style="text-align: center;width: 100%;">
+        <div style="text-align: center;background: white;width: 50%;display: inline-block;padding: 15px;">
+            <h1>Estadística - Api geoMeli </h1>
+            <div>
+                <div id="divError"
+                    style="display:none;padding:5px;background: rgb(255, 122, 122);color:rgb(51, 35, 35);margin-bottom: 20px;">
+                </div>
+                <div id="divSearching"
+                    style="display:none;padding:5px;background: rgb(255, 255, 122);color:rgb(51, 35, 35);margin-bottom: 20px;">
+                    Buscando Datos...
+                </div>
+                <input id="btnBack" type="button" value="volver" onclick="window.location.assign('/');" style="background: rgb(232, 255, 100);"></button>
+                <input id="btnSubmit" type="button" value="Actualizar estadística" onclick="loadAllStats();"></button>
+            </div>
+            <figure class="highcharts-figure">
+                <div id="container"></div>
+
+            <div style="width: 100%;">
+                <div id="divContainerMinDistance"  style="display: inline-block;margin-left: 10px;background: #fbda94;padding: 10px;margin:5px;">
+                    <div>País con mínima distancia</div>
+                    <label id="lblMinDistance" style="font-weight: bold;"></label>
+                </div>
+                <div id="divContainerMaxDistance" style="display: inline-block;margin-left: 10px;background: #a5ccff;padding: 10px;margin:5px;"> 
+                    <div>País con máxima distancia</div>
+                    <label id="lblMaxDistance" style="font-weight: bold;"></label>
+                </div>
+                <div id="divContainerMinDistance"  style="display: inline-block;margin-left: 10px;background: #f9fb94;padding: 10px;margin:5px;">
+                    <div>Promedio de distancias</div>
+                    <label id="lblDistanceAverage" style="font-weight: bold;"></label>
+                </div>
+            </div>
+
+            </figure>
+        </div>
+    </div>
+    <script>
+
+        $(document).ready(function(){
+            loadAllStats();
+        })
+
+        function loadAllStats(){
+            getCountryMinDistance() 
+            getCountryMaxDistance();
+            getDistanceAverage();
+            generateStatistic();
+        }
+
+        function getDistanceAverage() {
+            $.ajax({
+                url: "http://localhost:8082/api/stats/average",
+                method: "POST",
+                timeout: 0,
+                headers: {
+                    "Content-Type": "application/javascript"
+                },
+                success: function (data) {
+                    document.getElementById("lblDistanceAverage").innerHTML = `${data} km.`;
+
+                }, error: function (err) {
+
+                }
+            })
+        }
+
+        function getCountryMinDistance() {
+            $.ajax({
+                url: "http://localhost:8082/api/stats/min",
+                method: "POST",
+                timeout: 0,
+                dataType: "json",
+                headers: {
+                    "Content-Type": "application/javascript"
+                },
+                success: function (data) {
+                    var strCountriesMinDistance = "";
+                    Array.from(data).map((country, index) => {
+                        if(index > 0)
+                        strCountriesMinDistance += "<br> "
+
+                        strCountriesMinDistance += `${country.name} (${country.distanceToArgentina} km.)`;
+                    })
+
+                    document.getElementById("lblMinDistance").innerHTML = strCountriesMinDistance;
+
+                }, error: function (err) {
+
+                }
+            })
+        }
+
+        function getCountryMaxDistance() {
+            $.ajax({
+                url: "http://localhost:8082/api/stats/max",
+                method: "POST",
+                timeout: 0,
+                dataType: "json",
+                headers: {
+                    "Content-Type": "application/javascript"
+                },
+                success: function (data) {
+                    var strCountriesMaxDistance = "";
+                    Array.from(data).map((country, index) => {
+                        if(index > 0)
+                            strCountriesMaxDistance += "<br> "
+
+                        strCountriesMaxDistance += `${country.name} (${country.distanceToArgentina} km.)`;
+                    })
+
+                    document.getElementById("lblMaxDistance").innerHTML = strCountriesMaxDistance;
+
+                }, error: function (err) {
+
+                }
+            })
+        }
+
+        
+        function generateStatistic() {
+            $.ajax({
+                url: "http://localhost:8082/api/stats",
+                method: "POST",
+                timeout: 0,
+                dataType: "json",
+                headers: {
+                    "Content-Type": "application/javascript"
+                },
+                success: function (data) {
+                    var series = new Array();
+                    Array.from(data).map(country => {
+                        series.push(new Object({
+                            name: country.name,
+                            y: country.requestCount
+                        }))
+                    })
+
+                    char(series);
+
+                }, error: function (err) {
+
+                }
+            })
+        }
+
+        function char(var_series) {
+            Highcharts.chart('container', {
+    chart: {
+        type: 'column'
+    },
+    title: {
+        text: 'Ranking de request por paises'
+    },
+    subtitle: {
+        text: ''
+    },
+    accessibility: {
+        announceNewData: {
+            enabled: true
+        }
+    },
+    xAxis: {
+        type: 'category'
+    },
+    yAxis: {
+        title: {
+            text: 'Cantidad'
+        }
+
+    },
+    legend: {
+        enabled: false
+    },
+    exporting: {
+         enabled: false
+},
+credits: {
+     enabled: false
+},
+    plotOptions: {
+        series: {
+            borderWidth: 0,
+            dataLabels: {
+                enabled: true,
+                format: '{point.y}'
+            }
+        }
+    },
+
+    tooltip: {
+        pointFormat: '<b>{point.y}</b> ip request<br/>'
+    },
+
+    series: [
+        {
+            colorByPoint: true,
+            data: 
+              var_series
+        }
+    ]
+});
+        }
+    </script>
+</body>
+
+</html>

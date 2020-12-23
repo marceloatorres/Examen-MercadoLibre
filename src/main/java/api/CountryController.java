@@ -17,13 +17,12 @@ import model.Response;
 import service.ICountryService;
 import utils.ExternalApi;
 import utils.IpAddressValidator;
+import utils.Configuration;
 import utils.Configuration.UrlAPI;
 
-
-@RequestMapping("api")
+@RequestMapping("api/country")
 @RestController
 public class CountryController {
-	
 	ExternalApi externalApi = new ExternalApi(UrlAPI.IP);
 	RestTemplate restTemplate = new RestTemplate();
 	Response response;
@@ -34,8 +33,8 @@ public class CountryController {
 	@Autowired
   	private ICountryService countryService;
 	
-	@PostMapping
-	public String getRequest(@RequestBody String ipAddress) throws JsonProcessingException, ParseException, JSONException {
+	@PostMapping("/info")
+	public String getRequest(@RequestBody String ipAddress) throws Exception {
 		if(!IpAddressValidator.isValid(ipAddress)) {
 			response = new Response(false,"El ip ingresado es incorrecto",null);
 			return objectMapper.writeValueAsString(response);
@@ -45,34 +44,36 @@ public class CountryController {
 		String ipInformation = restTemplate.getForObject(externalApi.getUrl() + ipAddress, String.class); 
 		JSONObject  jsonIpResult = new JSONObject(ipInformation);
 		
-		if(jsonIpResult.getString("countryCode3").isEmpty()) {
+		if(jsonIpResult.getString(Configuration.NAME_PROPERTY_COUNTRY_CODE).isEmpty()) {
 			response = new Response(false,"El ip ingresado no se encontró",null);
 			return objectMapper.writeValueAsString(response);
 		}
 		
-		Country country = new Country();
-		country.setAlpha3Code(jsonIpResult.getString("countryCode3"));
-		Ip ip = new Ip(ipAddress, country);
-		
+		Ip ip = new Ip(ipAddress, new Country());
+		ip.getCountry().setAlpha3Code(jsonIpResult.getString(Configuration.NAME_PROPERTY_COUNTRY_CODE));
 		return getInfoCountry(ip);
 	}
 	
-	public String getInfoCountry(Ip ip) throws JsonProcessingException, JSONException, ParseException {
-		externalApi.setUrl(UrlAPI.COUNTRY);
-		Country country = restTemplate.getForObject(externalApi.getUrl() + ip.getCountry().getAlpha3Code(), Country.class);
+	public String getInfoCountry(Ip ip) throws Exception {
+		Country country = countryService.updateCountry(ip.getCountry().getAlpha3Code());
+		if(country == null) {
+			externalApi.setUrl(UrlAPI.COUNTRY);
+			String informationCountry = restTemplate.getForObject(externalApi.getUrl() + ip.getCountry().getAlpha3Code(), String.class);
+			country = new Country(informationCountry);
+		}
 		ip.setCountry(country);
-		countryService.saveCountry(ip.getCountry());
-		//return calculateRateUSD(ip); 
-		return objectMapper.writeValueAsString(ip);
+		return calculateRateUSD(ip); 
 	}
 	
-	public void calculateRateUSD(Ip ip) throws JsonProcessingException, ParseException, JSONException {
-		/*externalApi.setUrl(UrlAPI.RATE);
+	public String calculateRateUSD(Ip ip) throws JsonProcessingException, ParseException, JSONException {
+		externalApi.setUrl(UrlAPI.RATE);
 		String informationExchangeRate = restTemplate.getForObject(externalApi.getUrl() + ip.getCountry().createStringAllCurrencies(), String.class); 
 		JSONObject  jsonExchangeRatesResult = new JSONObject(informationExchangeRate); 
-		ip.getCountry().setAllRates(jsonExchangeRatesResult);
-		response = new Response(true,"",ip);
 		
-		return objectMapper.writeValueAsString(response);*/
+		ip.getCountry().setAllRates(jsonExchangeRatesResult);
+		countryService.saveCountry(ip.getCountry());
+		response = new Response(true,"",ip);
+		return objectMapper.writeValueAsString(response);
 	}
+	
 }

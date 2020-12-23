@@ -7,9 +7,11 @@ public class Configuration {
 		  RATE
 		}
 	
-	public static String CODERATETOEXCHANGE = "USD";
-	public static int LATCOUNTRYORIGIN = -34;
-	public static int LNGCOUNTRYORIGIN = -64;
-	public static int EARTHRADIUS = 6371;
+	public static String CURRENCY_CODE_TO_EXCHANGE = "USD";
+	public static String NAME_PROPERTY_CURRENCY_RATE= "rate";
+	public static String NAME_PROPERTY_COUNTRY_CODE= "countryCode3";
+	public static int LAT_COUNTRY_ORIGIN = -34;
+	public static int LNG_COUNTRY_ORIGIN = -64;
+	public static int EARTH_RADIUS = 6371;
 	
 }

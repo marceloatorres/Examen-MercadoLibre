@@ -12,7 +12,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @EntityScan("model")
 @EnableJpaRepositories("repository")
 public class MeliApplication {
-
 	public static void main(String[] args) {
 		SpringApplication.run(MeliApplication.class, args);
 	}

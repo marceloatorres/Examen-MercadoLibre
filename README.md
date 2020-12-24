@@ -42,43 +42,43 @@ Con esto ya tendrìamos la tabla principal 'countries' para el funcionamiento de
 - Generar el jar de nuestro proyecto ejecutando el siguiente comando en consola
     mvn clean package
     
-- continuar con la compilación
-    docker build -t user/examenMeli:V1 .
+- continuar con la compilación<br>
+    docker build -t user/examenMeli:V1 .<br>
     
-- Ver listado de todas las imágenes que tenemos en nuestro contenedor
-  docker images
+- Ver listado de todas las imágenes que tenemos en nuestro contenedor<br>
+  docker images<br>
 
-- Correr la imagen de nuestra aplicación en Spring
-    docker run --network my-net -d -p 18082:8082 --name examenMeli {ImageID} //ImageID es el token de imagen que nos devulve al ejecutar el comando anterior
+- Correr la imagen de nuestra aplicación en Spring<br>
+    docker run --network my-net -d -p 18082:8082 --name examenMeli {ImageID} //ImageID es el token de imagen que nos devulve al ejecutar el comando anterior<br>
     
-- Para consultar si esta nuestra imagen corriendo 
-  docker ps
+- Para consultar si esta nuestra imagen corriendo <br>
+  docker ps<br>
   
  
- Para utilizar la aplicación
+ Para utilizar la aplicación<br>
  
- - Ingresar desde el navegador http://localhost:8082
+ - Ingresar desde el navegador http://localhost:8082<br>
    
- - Consumir datos desde como ApiRest:
+ - Consumir datos desde como ApiRest:<br>
   
-    Método : POST
+    Método : POST<br>
     
-    - para obtener la información del país enviando la url:
-        http://localhost:8082/api/country/info
+    - para obtener la información del país enviando la url:<br>
+        http://localhost:8082/api/country/info<br>
         
-        body: 5.6.7.8 // o cualquier dirección IP
+        body: 5.6.7.8 // o cualquier dirección IP<br>
         
-    - para obtener información de todos los paises consultados:
-        http://localhost:8082/api/stats
+    - para obtener información de todos los paises consultados:<br>
+        http://localhost:8082/api/stats<br>
         
-    - para obtener el promedio de distancias consultadas:
-        http://localhost:8082/api/stats/average
+    - para obtener el promedio de distancias consultadas:<br>
+        http://localhost:8082/api/stats/average<br>
         
-    - para obtener el país con la máxima distancia consultada:
-        http://localhost:8082/api/stats/max
+    - para obtener el país con la máxima distancia consultada:<br>
+        http://localhost:8082/api/stats/max<br>
         
-    - para obtener el país con la mínima distancia consultada:
-        http://localhost:8082/api/stats/min
+    - para obtener el país con la mínima distancia consultada:<br>
+        http://localhost:8082/api/stats/min<br>
         
         
  

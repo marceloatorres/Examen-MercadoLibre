@@ -1,37 +1,38 @@
 # Examen-MercadoLibre
 
-Necesario:
-Docker 
-MySql
-Spring Boot
-Java 11
+Necesario:<br>
+Docker <br>
+MySql<br>
+Spring Boot<br>
+Java 11<br>
 <br>
-Pasos:
-- Desacargar el pryecto de git
-- Crear en Docker una imagen de mySql
-  docker pull mysql
+Pasos:<br>
+- Desacargar el pryecto de git<br>
+- Crear en Docker una imagen de mySql<br>
+  docker pull mysql<br>
   docker run -d -p 13306:3306 --name mysql_container -e MYSQL_ROOT_PASSWORD=secret mysql --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+  <br>
+  Dentro de mySql en consola:<br>
+    docker exec -it mysql_container mysql -uroot -p //perdirá password el cual es secret<br>
+    create user 'mysqluser' identified by 'secret';<br>
+    GRANT ALL PRIVILEGES ON *.* TO 'mysqluser'@'%';<br>
+    CREATE DATABASE ApiGeoMeli;<br>
+    USE ApiGeoMeli;<br>
   
-  Dentro de mySql en consola:
-    docker exec -it mysql_container mysql -uroot -p //perdirá password el cual es secret
-    create user 'mysqluser' identified by 'secret';
-    GRANT ALL PRIVILEGES ON *.* TO 'mysqluser'@'%';
-    CREATE DATABASE ApiGeoMeli;
-    USE ApiGeoMeli;
-  
-    CREATE TABLE countries(
-      alpha3Code VARCHAR(5) PRIMARY KEY,
-      alpha2Code VARCHAR(5),
-      name VARCHAR(255),
-      capital VARCHAR(255),
-      flag VARCHAR(255),
-      distance_to_argentina int,
-      lat decimal(5,2),
-      lng decimal(5,2),
-      request_count int
-    );
+    CREATE TABLE countries(<br>
+      alpha3Code VARCHAR(5) PRIMARY KEY,<br>
+      alpha2Code VARCHAR(5),<br>
+      name VARCHAR(255),<br>
+      capital VARCHAR(255),<br>
+      flag VARCHAR(255),<br>
+      distance_to_argentina int,<br>
+      lat decimal(5,2),<br>
+      lng decimal(5,2),<br>
+      request_count int<br>
+    );<br>
 
-Con esto ya tendrìamos la tabla principal 'countries' para el funcionamiento de la aplicación. Luego la misma aplciación generará las tablas que se relacionan con la principal.
+Con esto ya tendrìamos la tabla principal 'countries' para el funcionamiento de la aplicación. <br>
+Luego la misma aplciación generará las tablas que se relacionan con la principal.<br>
 
 
 - Crear una nueva red en Docker<br>
@@ -39,8 +40,8 @@ Con esto ya tendrìamos la tabla principal 'countries' para el funcionamiento de
   docker network disconnect bridge mysql_container<br>
   docker network connect my-net mysql_container<br>
   
-- Generar el jar de nuestro proyecto ejecutando el siguiente comando en consola
-    mvn clean package
+- Generar el jar de nuestro proyecto ejecutando el siguiente comando en consola<br>
+    mvn clean package<br>
     
 - continuar con la compilación<br>
     docker build -t user/examenMeli:V1 .<br>

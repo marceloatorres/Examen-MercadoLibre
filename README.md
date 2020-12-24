@@ -1,11 +1,11 @@
 # Examen-MercadoLibre
 
-##Necesario:
-###Docker 
-###MySql
-###Spring Boot
-###Java 11
-
+Necesario:
+Docker 
+MySql
+Spring Boot
+Java 11
+<br>
 Pasos:
 - Desacargar el pryecto de git
 - Crear en Docker una imagen de mySql
@@ -34,10 +34,10 @@ Pasos:
 Con esto ya tendrìamos la tabla principal 'countries' para el funcionamiento de la aplicación. Luego la misma aplciación generará las tablas que se relacionan con la principal.
 
 
-- Crear una nueva red en Docker
-  docker network create --driver bridge my-net
-  docker network disconnect bridge mysql_container
-  docker network connect my-net mysql_container
+- Crear una nueva red en Docker<br>
+  docker network create --driver bridge my-net<br>
+  docker network disconnect bridge mysql_container<br>
+  docker network connect my-net mysql_container<br>
   
 - Generar el jar de nuestro proyecto ejecutando el siguiente comando en consola
     mvn clean package

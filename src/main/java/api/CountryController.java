@@ -34,45 +34,61 @@ public class CountryController {
 	
 	@PostMapping("/info")
 	public String getRequest(@RequestBody String ipAddress) throws Exception {
-		if(!Ip.isValid(ipAddress)) {
-			response = new Response(false,"El ip ingresado es incorrecto",null);
+		try {
+			if(!Ip.isValid(ipAddress)) {
+				response = new Response(false,"El ip ingresado es incorrecto",null);
+				return objectMapper.writeValueAsString(response);
+			}
+			
+			externalApi.setUrl(UrlAPI.IP);
+			String ipInformation = restTemplate.getForObject(externalApi.getUrl() + ipAddress, String.class); 
+			JSONObject  jsonIpResult = new JSONObject(ipInformation);
+			
+			if(jsonIpResult.getString(Configuration.NAME_PROPERTY_COUNTRY_CODE).isEmpty()) {
+				response = new Response(false,"El ip ingresado no se encontró",null);
+				return objectMapper.writeValueAsString(response);
+			}
+			
+			Ip ip = new Ip(ipAddress, new Country());
+			ip.getCountry().setAlpha3Code(jsonIpResult.getString(Configuration.NAME_PROPERTY_COUNTRY_CODE));
+			return getInfoCountry(ip);
+		}catch(Exception e){
+			response = new Response(false,"Ocurrió un error al obtener la información de la dirección IP.",null);
 			return objectMapper.writeValueAsString(response);
 		}
 		
-		externalApi.setUrl(UrlAPI.IP);
-		String ipInformation = restTemplate.getForObject(externalApi.getUrl() + ipAddress, String.class); 
-		JSONObject  jsonIpResult = new JSONObject(ipInformation);
-		
-		if(jsonIpResult.getString(Configuration.NAME_PROPERTY_COUNTRY_CODE).isEmpty()) {
-			response = new Response(false,"El ip ingresado no se encontró",null);
-			return objectMapper.writeValueAsString(response);
-		}
-		
-		Ip ip = new Ip(ipAddress, new Country());
-		ip.getCountry().setAlpha3Code(jsonIpResult.getString(Configuration.NAME_PROPERTY_COUNTRY_CODE));
-		return getInfoCountry(ip);
 	}
 	
 	public String getInfoCountry(Ip ip) throws Exception {
-		Country country = countryService.updateCountry(ip.getCountry().getAlpha3Code());
-		if(country == null) {
-			externalApi.setUrl(UrlAPI.COUNTRY);
-			String informationCountry = restTemplate.getForObject(externalApi.getUrl() + ip.getCountry().getAlpha3Code(), String.class);
-			country = new Country(informationCountry);
+		try {
+			Country country = countryService.updateCountry(ip.getCountry().getAlpha3Code());
+			if(country == null) {
+				externalApi.setUrl(UrlAPI.COUNTRY);
+				String informationCountry = restTemplate.getForObject(externalApi.getUrl() + ip.getCountry().getAlpha3Code(), String.class);
+				country = new Country(informationCountry);
+			}
+			ip.setCountry(country);
+			return calculateRateUSD(ip); 
+		}catch(Exception e) {
+			response = new Response(false,"Ocurrió un error al obtener la información del país.",null);
+			return objectMapper.writeValueAsString(response);
 		}
-		ip.setCountry(country);
-		return calculateRateUSD(ip); 
 	}
 	
 	public String calculateRateUSD(Ip ip) throws JsonProcessingException, ParseException, JSONException {
-		externalApi.setUrl(UrlAPI.RATE);
-		String informationExchangeRate = restTemplate.getForObject(externalApi.getUrl() + ip.getCountry().createStringAllCurrencies(), String.class); 
-		JSONObject  jsonExchangeRatesResult = new JSONObject(informationExchangeRate); 
+		try {
+			externalApi.setUrl(UrlAPI.RATE);
+			String informationExchangeRate = restTemplate.getForObject(externalApi.getUrl() + ip.getCountry().createStringAllCurrencies(), String.class); 
+			JSONObject  jsonExchangeRatesResult = new JSONObject(informationExchangeRate); 
+			ip.getCountry().setAllRates(jsonExchangeRatesResult);
+			countryService.saveCountry(ip.getCountry());
+			response = new Response(true,"",ip);
+			return objectMapper.writeValueAsString(response);
+		}catch(Exception e) {
+			response = new Response(false,"Ocurrió un error al calcular el valor de cambio de moneda.",null);
+			return objectMapper.writeValueAsString(response);
+		}
 		
-		ip.getCountry().setAllRates(jsonExchangeRatesResult);
-		countryService.saveCountry(ip.getCountry());
-		response = new Response(true,"",ip);
-		return objectMapper.writeValueAsString(response);
 	}
 	
 }

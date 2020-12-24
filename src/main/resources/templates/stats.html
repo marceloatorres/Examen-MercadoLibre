@@ -138,7 +138,8 @@
                     "Content-Type": "application/javascript"
                 },
                 success: function (data) {
-                    document.getElementById("lblDistanceAverage").innerHTML = `${data} km.`;
+                    if(data != null)
+                        document.getElementById("lblDistanceAverage").innerHTML = `${data} km.`;
 
                 }, error: function (err) {
                     document.getElementById("lblDistanceAverage").innerHTML = "No encontrado";
@@ -156,6 +157,7 @@
                     "Content-Type": "application/javascript"
                 },
                 success: function (country) {
+                    if(country != null)
                     document.getElementById("lblMinDistance").innerHTML = `${country.name} (${country.distanceToArgentina} km.)`;
                 }, error: function (err) {
                     document.getElementById("lblMinDistance").innerHTML = "No encontrado";
@@ -173,7 +175,8 @@
                     "Content-Type": "application/javascript"
                 },
                 success: function (country) {
-                    document.getElementById("lblMaxDistance").innerHTML = `${country.name} (${country.distanceToArgentina} km.)`;
+                    if(country != null)
+                        document.getElementById("lblMaxDistance").innerHTML = `${country.name} (${country.distanceToArgentina} km.)`;
                 }, error: function (err) {
                     document.getElementById("lblMaxDistance").innerHTML = "No encontrado";
                 }
@@ -193,7 +196,7 @@
                     var series = new Array();
                     Array.from(data).map(country => {
                         series.push(new Object({
-                            name: country.name,
+                            name: `${country.name} <br>(${country.distanceToArgentina} km.)`,
                             y: country.requestCount
                         }))
                     })

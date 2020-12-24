@@ -1,10 +1,10 @@
 # Examen-MercadoLibre
 
-Necesario:
-Docker 
-MySql
-Spring Boot
-Java 11
+##Necesario:
+###Docker 
+###MySql
+###Spring Boot
+###Java 11
 
 Pasos:
 - Desacargar el pryecto de git

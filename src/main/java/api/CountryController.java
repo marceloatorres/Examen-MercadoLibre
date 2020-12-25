@@ -61,27 +61,34 @@ public class CountryController {
 	
 	public String getInfoCountry(Ip ip) throws Exception {
 		try {
-			Country country = countryService.updateCountry(ip.getCountry().getAlpha3Code());
-			if(country == null) {
+			Country country = countryService.getCountryByAlphaCode(ip.getCountry().getAlpha3Code());
+			boolean countryFound = (country!= null);
+			if(!countryFound) {
 				externalApi.setUrl(UrlAPI.COUNTRY);
 				String informationCountry = restTemplate.getForObject(externalApi.getUrl() + ip.getCountry().getAlpha3Code(), String.class);
 				country = new Country(informationCountry);
+			}else {
+				country.increaseRequestCount();
 			}
 			ip.setCountry(country);
-			return calculateRateUSD(ip); 
+			return calculateRateUSD(ip,countryFound); 
 		}catch(Exception e) {
 			response = new Response(false,"Ocurrió un error al obtener la información del país.",null);
 			return objectMapper.writeValueAsString(response);
 		}
 	}
 	
-	public String calculateRateUSD(Ip ip) throws JsonProcessingException, ParseException, JSONException {
+	public String calculateRateUSD(Ip ip, boolean countryFound) throws JsonProcessingException, ParseException, JSONException {
 		try {
 			externalApi.setUrl(UrlAPI.RATE);
 			String informationExchangeRate = restTemplate.getForObject(externalApi.getUrl() + ip.getCountry().createStringAllCurrencies(), String.class); 
 			JSONObject  jsonExchangeRatesResult = new JSONObject(informationExchangeRate); 
 			ip.getCountry().setAllRates(jsonExchangeRatesResult);
-			countryService.saveCountry(ip.getCountry());
+			if(countryFound) {
+				countryService.updateCountry(ip.getCountry());
+			}else {
+				countryService.saveCountry(ip.getCountry());	
+			}
 			response = new Response(true,"",ip);
 			return objectMapper.writeValueAsString(response);
 		}catch(Exception e) {

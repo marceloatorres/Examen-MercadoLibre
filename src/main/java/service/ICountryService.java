@@ -6,8 +6,9 @@ import model.Country;
 public interface ICountryService {
 	List<Country> getAllCountries();
 	Country saveCountry(Country country);
-	Country updateCountry(String code1);
+	Country updateCountry(Country country);
 	Country getMax() ;
 	Country getMin() ;
 	long distanceAverage();
+	Country getCountryByAlphaCode(String alpha3Code);
 }

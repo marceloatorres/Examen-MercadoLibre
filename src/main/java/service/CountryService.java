@@ -46,17 +46,25 @@ public class CountryService implements ICountryService {
 	}
 
 	@Override
-	public Country updateCountry(String code1) {
-			Country updatedCountry = new Country();
-				Country country = new Country();
-				country = countryRepository.findById(code1).orElse(null);
-				if(country == null) {
-					return null;
-				}
-				country.increaseRequestCount();
-				updatedCountry = countryRepository.save(country);
-			return updatedCountry;
+	public Country updateCountry(Country country) {
+		Country updatedCountry = new Country();
+			//Country country = new Country();
+			//country = countryRepository.findById(code1).orElse(null);
+			if(country == null) {
+				return null;
+			}
+			//country.increaseRequestCount();
+			updatedCountry = countryRepository.save(country);
+		return updatedCountry;
 	}
+	
+	@Override
+	public Country getCountryByAlphaCode(String alpha3Code) {
+		Country country = new Country();
+		country = countryRepository.findById(alpha3Code).orElse(null);
+	    return country;
+	}
+	
 
 	@Override
 	@Async

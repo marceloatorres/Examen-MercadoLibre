@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import model.Country;
 import model.Ip;
 import model.Response;
+import repository.SingletonCountry;
 import service.ICountryService;
 import utils.ExternalApi;
 import utils.Configuration;
@@ -40,6 +41,7 @@ public class CountryController {
 				return objectMapper.writeValueAsString(response);
 			}
 			
+			//Se busca en API externa los datos de la ip ingresada
 			externalApi.setUrl(UrlAPI.IP);
 			String ipInformation = restTemplate.getForObject(externalApi.getUrl() + ipAddress, String.class); 
 			JSONObject  jsonIpResult = new JSONObject(ipInformation);
@@ -61,7 +63,15 @@ public class CountryController {
 	
 	public String getInfoCountry(Ip ip) throws Exception {
 		try {
-			Country country = countryService.getCountryByAlphaCode(ip.getCountry().getAlpha3Code());
+			//Antes información del país en la API externa lo busco en mi objecto singleto y en mi bd
+			SingletonCountry singletonCountry = SingletonCountry.getSingletonCountry();
+			Country country = null;
+			if(singletonCountry.getAllCountries() != null)
+				country = singletonCountry.findCountryByAlpha3Code(ip.getCountry().getAlpha3Code());
+			
+			if(country == null)
+				country = countryService.getCountryByAlphaCode(ip.getCountry().getAlpha3Code());
+					
 			boolean countryFound = (country!= null);
 			if(!countryFound) {
 				externalApi.setUrl(UrlAPI.COUNTRY);
@@ -80,15 +90,20 @@ public class CountryController {
 	
 	public String calculateRateUSD(Ip ip, boolean countryFound) throws JsonProcessingException, ParseException, JSONException {
 		try {
-			externalApi.setUrl(UrlAPI.RATE);
-			String informationExchangeRate = restTemplate.getForObject(externalApi.getUrl() + ip.getCountry().createStringAllCurrencies(), String.class); 
-			JSONObject  jsonExchangeRatesResult = new JSONObject(informationExchangeRate); 
-			ip.getCountry().setAllRates(jsonExchangeRatesResult);
+			//Verifico que sea necesario actualizar las tarifas de cambio, si ya se consultó para el mismo día utilizo el singleton
+			if(ip.getCountry().shouldUpdateRateCurrency()) {
+				externalApi.setUrl(UrlAPI.RATE);
+				String informationExchangeRate = restTemplate.getForObject(externalApi.getUrl() + ip.getCountry().createStringAllCurrencies(), String.class); 
+				JSONObject  jsonExchangeRatesResult = new JSONObject(informationExchangeRate); 
+				ip.getCountry().setAllRates(jsonExchangeRatesResult);
+			}
+			
 			if(countryFound) {
 				countryService.updateCountry(ip.getCountry());
 			}else {
 				countryService.saveCountry(ip.getCountry());	
 			}
+			
 			response = new Response(true,"",ip);
 			return objectMapper.writeValueAsString(response);
 		}catch(Exception e) {

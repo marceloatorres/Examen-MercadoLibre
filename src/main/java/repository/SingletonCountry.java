@@ -146,4 +146,8 @@ public class SingletonCountry {
 		this.setLastUpdateAverage(now);
 		this.setLastUpdateAllCountries(now);
 	}
+	
+	public Country findCountryByAlpha3Code(String alpha3code) {
+		return this.getAllCountries().stream().filter(code -> alpha3code.equals(code.getAlpha3Code())).findFirst().orElse(null);
+	}
 }

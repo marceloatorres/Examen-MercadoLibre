@@ -1,5 +1,8 @@
 package model;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -218,6 +221,28 @@ public class Country {
 	
 	public int calcToAverage() {
 		return this.distanceToArgentina * this.requestCount;
+	}
+	
+	public boolean shouldUpdateRateCurrency(){
+		boolean updateRate = false;
+		if(this.getCurrencies() != null) {
+			for(int i = 0 ; i < this.getCurrencies().size(); i++) {
+				Currency currentCurrency = this.getCurrencies().get(i);
+				if(currentCurrency.getDateExchange() != null) {
+					DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+					String str = currentCurrency.getDateExchange() + " 00:00";
+					LocalDateTime dateTime = LocalDateTime.parse(str, formatter);
+					long diff = ChronoUnit.DAYS.between(dateTime, LocalDateTime.now());
+					if(diff > 0) {
+						updateRate = true;
+						break;
+					}	
+				}else {
+					updateRate = true;
+				}
+			}
+		}
+		return updateRate;
 	}
 	
 }

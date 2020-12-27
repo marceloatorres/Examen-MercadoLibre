@@ -1,35 +1,18 @@
-# Examen-MercadoLibre
+# Test-MercadoLibre
 
-ApiGeoMeli es una aplicación desarrollada en Java bajo el framework de Spring con el objetivo de brindar información para direcciones IP.
+ApiGeoMeli is an application to get country information from ip address.<br>
 
-Para correr la aplicación solo se deberá ejecutar el comando en consola:
-  docker-compose up
+To use, dewonload this repository and excecute in bash console: `./start.sh`<br>
+
+Is necesary you have Maven installed. <br>
   
+Open browser and go to http://localhost:8080 .<br><br>
  
- Para utilizar la aplicación<br>
- 
- - Ingresar desde el navegador http://localhost:8080<br>
-   
- - Consumir datos desde como ApiRest:<br>
-  
-    Método : POST<br>
-    
-    - para obtener la información del país enviando la url:<br>
-        http://localhost:8080/api/country/info<br>
-        
-        body: 5.6.7.8 // o cualquier dirección IP<br>
-        
-    - para obtener información de todos los paises consultados:<br>
-        http://localhost:8080/api/stats<br>
-        
-    - para obtener el promedio de distancias consultadas:<br>
-        http://localhost:8082/api/stats/average<br>
-        
-    - para obtener el país con la máxima distancia consultada:<br>
-        http://localhost:8080/api/stats/max<br>
-        
-    - para obtener el país con la mínima distancia consultada:<br>
-        http://localhost:8080/api/stats/min<br>
-        
-        
- 
+If you want use as ApiRest for data json only:<br>
+Method to use: POST<br><br>
+
+Uris to get json data:<br>
+
+get json of all countries consulted:
+`http://localhost:8080/api/country/info`<br>
+on `body` remember write ip adrees i.e: `5.6.7.8` (Germany ip address)

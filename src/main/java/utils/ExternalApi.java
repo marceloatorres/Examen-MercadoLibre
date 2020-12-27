@@ -1,7 +1,4 @@
 package utils;
-
-import utils.Configuration.UrlAPI;
-
 public class ExternalApi {
 
 	private String url;

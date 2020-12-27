@@ -1,14 +1,14 @@
-package model;
+package response;
 
 public class Response {
 	private boolean success;
 	private String message;
-	private Ip ip;
+	//private Ip ip;
 	
-	public Response(boolean success, String message, Ip ip) {
+	public Response(boolean success, String message){//, Ip ip) {
 		this.success = success;
 		this.message = message;
-		this.ip = ip;
+		//this.ip = ip;
 	}
 	
 	public boolean isSuccess() {
@@ -23,11 +23,11 @@ public class Response {
 	public void setMessage(String message) {
 		this.message = message;
 	}
-	public Ip getIp() {
+	/*public Ip getIp() {
 		return ip;
 	}
 	public void setIp(Ip ip) {
 		this.ip = ip;
-	}
+	}*/
 	
 }

@@ -17,7 +17,6 @@ public class CountryService implements ICountryService {
 	@Autowired
 	private CountryRepository countryRepository;
 	
-	
 	@Override
 	@Async
 	public List<Country> getAllCountries() {
@@ -32,7 +31,6 @@ public class CountryService implements ICountryService {
 		}
 		return singletonCountry.getAllCountries();
 	}
-
 
 	@Override
 	public Country saveCountry(Country country) {
@@ -55,7 +53,6 @@ public class CountryService implements ICountryService {
 		country = countryRepository.findById(alpha3Code).orElse(null);
 	    return country;
 	}
-	
 
 	@Override
 	@Async
@@ -77,6 +74,7 @@ public class CountryService implements ICountryService {
 	@Async
 	public Country getMin() {
 		SingletonCountry singletonCountry = SingletonCountry.getSingletonCountry();
+		//Verfico si esta en el objecto singleton menos del tiempo configurado
 		if(singletonCountry.getMinDistanceCountry() == null || singletonCountry.shouldUpdate(singletonCountry.getLastUpdateMinDistance())) {
 			try {
 				singletonCountry.setMinDistanceCountry(countryRepository.findMin());

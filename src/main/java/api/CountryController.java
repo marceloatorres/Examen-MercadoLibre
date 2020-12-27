@@ -13,19 +13,21 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import model.Country;
 import model.Ip;
-import model.Response;
 import repository.SingletonCountry;
+import response.FactoryResponse;
+import response.IResponse;
 import service.ICountryService;
 import utils.ExternalApi;
+import utils.TypeResponse;
 import utils.Configuration;
-import utils.Configuration.UrlAPI;
+import utils.UrlAPI;
 
 @RequestMapping("api/country")
 @RestController
 public class CountryController {
 	ExternalApi externalApi = new ExternalApi(UrlAPI.IP);
 	RestTemplate restTemplate = new RestTemplate();
-	Response response;
+	FactoryResponse factoryResponse = new FactoryResponse();
 	
 	@Autowired
     private ObjectMapper objectMapper;
@@ -35,9 +37,10 @@ public class CountryController {
 	
 	@PostMapping("/info")
 	public String getRequest(@RequestBody String ipAddress) throws Exception {
+		IResponse response;
 		try {
 			if(!Ip.isValid(ipAddress)) {
-				response = new Response(false,"El ip ingresado es incorrecto",null);
+				response = factoryResponse.getObjectResponse(TypeResponse.IP,false,"El ip ingresado es incorrecto",null); 
 				return objectMapper.writeValueAsString(response);
 			}
 			
@@ -47,7 +50,7 @@ public class CountryController {
 			JSONObject  jsonIpResult = new JSONObject(ipInformation);
 			
 			if(jsonIpResult.getString(Configuration.NAME_PROPERTY_COUNTRY_CODE).isEmpty()) {
-				response = new Response(false,"El ip ingresado no se encontró",null);
+				response = factoryResponse.getObjectResponse(TypeResponse.IP,false,"El ip ingresado no se encontró",null);
 				return objectMapper.writeValueAsString(response);
 			}
 			
@@ -55,13 +58,14 @@ public class CountryController {
 			ip.getCountry().setAlpha3Code(jsonIpResult.getString(Configuration.NAME_PROPERTY_COUNTRY_CODE));
 			return getInfoCountry(ip);
 		}catch(Exception e){
-			response = new Response(false,"Ocurrió un error al obtener la información de la dirección IP.",null);
+			response = factoryResponse.getObjectResponse(TypeResponse.IP,false,"Ocurrió un error al obtener la información de la dirección IP.",null);
 			return objectMapper.writeValueAsString(response);
 		}
 		
 	}
 	
 	public String getInfoCountry(Ip ip) throws Exception {
+		IResponse response;
 		try {
 			//Antes informacion del pais en la API externa lo busco en mi objecto singleto y en mi bd
 			SingletonCountry singletonCountry = SingletonCountry.getSingletonCountry();
@@ -83,12 +87,13 @@ public class CountryController {
 			ip.setCountry(country);
 			return calculateRateUSD(ip,countryFound); 
 		}catch(Exception e) {
-			response = new Response(false,"Ocurrió un error al obtener la información del país.",null);
+			response = factoryResponse.getObjectResponse(TypeResponse.IP,false,"Ocurrió un error al obtener la información del país.",null);
 			return objectMapper.writeValueAsString(response);
 		}
 	}
 	
 	public String calculateRateUSD(Ip ip, boolean countryFound) throws JsonProcessingException, ParseException, JSONException {
+		IResponse response;
 		try {
 			//Verifico que sea necesario actualizar las tarifas de cambio, si ya se consulto para el mismo dia utilizo el singleton
 			if(ip.getCountry().shouldUpdateRateCurrency()) {
@@ -104,10 +109,10 @@ public class CountryController {
 				countryService.saveCountry(ip.getCountry());	
 			}
 			
-			response = new Response(true,"",ip);
+			response = factoryResponse.getObjectResponse(TypeResponse.IP,true,"",ip);
 			return objectMapper.writeValueAsString(response);
 		}catch(Exception e) {
-			response = new Response(false,"Ocurrió un error al calcular el valor de cambio de moneda.",null);
+			response = factoryResponse.getObjectResponse(TypeResponse.IP,false,"Ocurrió un error al calcular el valor de cambio de moneda.",null);
 			return objectMapper.writeValueAsString(response);
 		}
 		

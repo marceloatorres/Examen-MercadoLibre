@@ -11,8 +11,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import model.Country;
-import model.Response;
+import response.FactoryResponse;
+import response.IResponse;
 import service.ICountryService;
+import utils.TypeResponse;
 
 @RequestMapping("api/stats")
 @RestController
@@ -23,47 +25,53 @@ public class StatisticsController {
 	@Autowired
     private ObjectMapper objectMapper;
 	
-	private Response response;
+	FactoryResponse factoryResponse = new FactoryResponse();
 	
 	@PostMapping
 	public String getRequest() throws JsonProcessingException {
+		IResponse response;
 		try {
 			List<Country> countries = countryService.getAllCountries();
-			return objectMapper.writeValueAsString(countries);
+			response = factoryResponse.getObjectResponse(TypeResponse.STATISTIC,true,"", countries);
 		} catch(Exception e) {
-			response = new Response(false,"Ocurrió un error obtener datos de los países", null);
-			return objectMapper.writeValueAsString(response);
+			response = factoryResponse.getObjectResponse(TypeResponse.STATISTIC,false,"Ocurrió un error obtener datos de los países", null);
 		}
+		return objectMapper.writeValueAsString(response);
 	}
-	
 
 	@PostMapping("/average")
 	public String average() throws JsonProcessingException {
+		IResponse response;
 		try {
-			return objectMapper.writeValueAsString(countryService.distanceAverage());
+			Long average = countryService.distanceAverage();
+			response = factoryResponse.getObjectResponse(TypeResponse.LONG,true,"", average);
 		}catch(Exception e) {
-			response = new Response(false,"Ocurrió un error obtener el promedio de distancias", null);
-			return objectMapper.writeValueAsString(response);
+			response = factoryResponse.getObjectResponse(TypeResponse.LONG,false,"Ocurrió un error obtener el promedio de distancias", null);
 		}
+		return objectMapper.writeValueAsString(response);
 	}
 	
 	@PostMapping("/max")
 	public String max() throws JsonProcessingException {
+		IResponse response;
 		try {
-			return objectMapper.writeValueAsString(countryService.getMax());
+			Country countryMaxDistance = countryService.getMax();
+			response = factoryResponse.getObjectResponse(TypeResponse.COUNTRY,true,"", countryMaxDistance);
 		}catch(Exception e){
-			response = new Response(false,"Ocurrió un error obtener el país con máxima distancia", null);
-			return objectMapper.writeValueAsString(response);	
+			response = factoryResponse.getObjectResponse(TypeResponse.COUNTRY,false,"Ocurrió un error obtener el país con máxima distancia", null);
 		}
+		return objectMapper.writeValueAsString(response);	
 	}
 	
 	@PostMapping("/min")
 	public String min() throws JsonProcessingException {
+		IResponse response;
 		try {
-			return objectMapper.writeValueAsString(countryService.getMin());
+			Country countryMaxDistance = countryService.getMin();
+			response =  factoryResponse.getObjectResponse(TypeResponse.COUNTRY,true,"", countryMaxDistance);
 		}catch(Exception e){
-			response = new Response(false,"Ocurrió un error obtener el país con mínima distancia", null);
-			return objectMapper.writeValueAsString(response);	
+			response =  factoryResponse.getObjectResponse(TypeResponse.COUNTRY,false,"Ocurrió un error obtener el país con mínima distancia", null);
 		}
+		return objectMapper.writeValueAsString(response);
 	}
 }

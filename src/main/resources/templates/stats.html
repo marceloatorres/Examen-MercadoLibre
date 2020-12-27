@@ -28,7 +28,7 @@
         .panelData {
             text-align: center;
             background: white;
-            width: 50%;
+            width: 70%;
             display: inline-block;
             padding: 15px;
         }
@@ -134,13 +134,15 @@
                 url: "http://localhost:8080/api/stats/average",
                 method: "POST",
                 timeout: 0,
+                dataType: "json",
                 headers: {
                     "Content-Type": "application/javascript"
                 },
                 success: function (data) {
-                    if(data != null)
-                        document.getElementById("lblDistanceAverage").innerHTML = `${data} km.`;
-
+                    if(data.success){
+                        if(data.result != null)
+                            document.getElementById("lblDistanceAverage").innerHTML = `${data.result} km.`;
+                    }
                 }, error: function (err) {
                     document.getElementById("lblDistanceAverage").innerHTML = "No encontrado";
                 }
@@ -156,9 +158,11 @@
                 headers: {
                     "Content-Type": "application/javascript"
                 },
-                success: function (country) {
-                    if(country != null)
-                    document.getElementById("lblMinDistance").innerHTML = `${country.name} (${country.distanceToArgentina} km.)`;
+                success: function (data) {
+                    if(data.success){
+                        if(data.country != null)
+                        document.getElementById("lblMinDistance").innerHTML = `${data.country.name} (${data.country.distanceToArgentina} km.)`;
+                    }
                 }, error: function (err) {
                     document.getElementById("lblMinDistance").innerHTML = "No encontrado";
                 }
@@ -174,9 +178,11 @@
                 headers: {
                     "Content-Type": "application/javascript"
                 },
-                success: function (country) {
-                    if(country != null)
-                        document.getElementById("lblMaxDistance").innerHTML = `${country.name} (${country.distanceToArgentina} km.)`;
+                success: function (data) {
+                    if(data.success){
+                        if(data.country != null)
+                            document.getElementById("lblMaxDistance").innerHTML = `${data.country.name} (${data.country.distanceToArgentina} km.)`;
+                    }
                 }, error: function (err) {
                     document.getElementById("lblMaxDistance").innerHTML = "No encontrado";
                 }
@@ -193,16 +199,17 @@
                     "Content-Type": "application/javascript"
                 },
                 success: function (data) {
-                    var series = new Array();
-                    Array.from(data).map(country => {
-                        series.push(new Object({
-                            name: `${country.name} <br>(${country.distanceToArgentina} km.)`,
-                            y: country.requestCount
-                        }))
-                    })
+                    if(data.success){
+                        var series = new Array();
+                        Array.from(data.countries).map(country => {
+                            series.push(new Object({
+                                name: `${country.name} <br>(${country.distanceToArgentina} km.)`,
+                                y: country.requestCount
+                            }))
+                        })
 
-                    char(series);
-
+                        char(series);
+                    }
                 }, error: function (err) {
 
                 }

@@ -1,6 +1,12 @@
 package model;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+
 import javax.persistence.Embeddable;
+
+import utils.Configuration;
 @Embeddable 
 public class Currency {
 	private String code;
@@ -62,6 +68,20 @@ public class Currency {
 			return priceUSD / priceCurrency;
 		else
 			return (double) -1;
+	}
+	public boolean shouldUpdate() {
+		if(this.getDateExchange() != null) {
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern(Configuration.FORMAT_DATETIME);
+			String str = this.getDateExchange() + " 00:00";
+			LocalDateTime dateTime = LocalDateTime.parse(str, formatter);
+			long diff = ChronoUnit.DAYS.between(dateTime, LocalDateTime.now());
+			if(diff > 0) {
+				return true;
+			}	
+		}else {
+			return true;
+		}
+		return false;
 	}
 	
 }

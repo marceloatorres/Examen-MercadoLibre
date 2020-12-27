@@ -63,7 +63,7 @@ public class CountryController {
 	
 	public String getInfoCountry(Ip ip) throws Exception {
 		try {
-			//Antes información del país en la API externa lo busco en mi objecto singleto y en mi bd
+			//Antes informacion del pais en la API externa lo busco en mi objecto singleto y en mi bd
 			SingletonCountry singletonCountry = SingletonCountry.getSingletonCountry();
 			Country country = null;
 			if(singletonCountry.getAllCountries() != null)
@@ -90,7 +90,7 @@ public class CountryController {
 	
 	public String calculateRateUSD(Ip ip, boolean countryFound) throws JsonProcessingException, ParseException, JSONException {
 		try {
-			//Verifico que sea necesario actualizar las tarifas de cambio, si ya se consultó para el mismo día utilizo el singleton
+			//Verifico que sea necesario actualizar las tarifas de cambio, si ya se consulto para el mismo dia utilizo el singleton
 			if(ip.getCountry().shouldUpdateRateCurrency()) {
 				externalApi.setUrl(UrlAPI.RATE);
 				String informationExchangeRate = restTemplate.getForObject(externalApi.getUrl() + ip.getCountry().createStringAllCurrencies(), String.class); 

@@ -2,6 +2,7 @@ version: "3"
 services:
   examen_mercadolibre:
     image: examen_mercadolibre
+    restart: always
     ports:
       - "8080:8080"
     networks:
@@ -11,6 +12,8 @@ services:
  
   mysqldb:
     image: mysql:latest
+    volumes:
+      - ./mysql_init:/docker-entrypoint-initdb.d
     networks:
       - country-mysql
     environment:
@@ -18,4 +21,5 @@ services:
       - MYSQL_DATABASE=ApiGeoMeli  
 
 networks:
-  country-mysql: 
+  country-mysql:
+     driver: bridge 

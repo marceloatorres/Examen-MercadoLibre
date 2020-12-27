@@ -1,12 +1,10 @@
 # Test-MercadoLibre
 
-ApiGeoMeli is an application to get country information from ip address.<br>
+ApiGeoMeli is an application to get country information from ip address. To use, dewonload this repository and excecute in bash console: `./start.sh`<br>
 
-To use, dewonload this repository and excecute in bash console: `./start.sh`<br>
-
-Is necesary you have Maven installed. <br>
+*Is necesary you have Maven installed.
   
-Open browser and go to http://localhost:8080 .<br><br>
+Open browser, go to http://localhost:8080 and enjoy it.<br>
  
 If you want use as ApiRest for data json only:<br>
 Method to use: POST<br><br>

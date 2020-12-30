@@ -7,13 +7,13 @@ import model.Country;
 
 @Repository
 public interface CountryRepository extends JpaRepository<Country, String>{
-	@Query(value= "SELECT * FROM countries WHERE distance_to_argentina = (SELECT MAX(distance_to_argentina) FROM countries) limit 1;;", nativeQuery = true)
+	@Query(value= "SELECT * FROM countries WHERE distance_to_other_place = (SELECT MAX(distance_to_other_place) FROM countries) limit 1;", nativeQuery = true)
 	Country findMax();
 	
-	@Query(value= "SELECT * FROM countries WHERE distance_to_argentina = (SELECT MIN(distance_to_argentina) FROM countries) limit 1;;", nativeQuery = true)
+	@Query(value= "SELECT * FROM countries WHERE distance_to_other_place = (SELECT MIN(distance_to_other_place) FROM countries) limit 1;", nativeQuery = true)
 	Country findMin();
 	
-	@Query(value ="select sum((distance_to_argentina * request_count))/ sum(request_count) from countries;", nativeQuery = true)
+	@Query(value ="select sum((distance_to_other_place * request_count))/ sum(request_count) from countries;", nativeQuery = true)
 	long distanceAverage();
 
 }

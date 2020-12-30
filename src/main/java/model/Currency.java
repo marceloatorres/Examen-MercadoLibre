@@ -13,19 +13,20 @@ public class Currency {
 	private String name;
 	private String symbol;
 	private String dateExchange;
-	private Double exchangeRate;
+	private float exchangeRate;
 	
 	public Currency() {
+		
 	}
 	
-	public Currency(String code, String name, String symbol, String dateExchange, Double exchangeRate) {
-	super();
-	this.code = code;
-	this.name = name;
-	this.symbol = symbol;
-	this.dateExchange = dateExchange;
-	this.exchangeRate = exchangeRate;
-}
+	public Currency(String code, String name, String symbol, String dateExchange, float exchangeRate) {
+		super();
+		this.code = code;
+		this.name = name;
+		this.symbol = symbol;
+		this.dateExchange = dateExchange;
+		this.exchangeRate = exchangeRate;
+	}
 
 	public String getDateExchange() {
 		return dateExchange;
@@ -35,11 +36,11 @@ public class Currency {
 		this.dateExchange = dateExchange;
 	}
 
-	public Double getExchangeRate() {
+	public float getExchangeRate() {
 		return exchangeRate;
 	}
 
-	public void setExchangeRate(Double exchangeRate) {
+	public void setExchangeRate(float exchangeRate) {
 		this.exchangeRate = exchangeRate;
 	}
 
@@ -50,25 +51,30 @@ public class Currency {
 	public void setCode(String code) {
 		this.code = code;
 	}
+	
 	public String getName() {
 		return name;
 	}
+	
 	public void setName(String name) {
 		this.name = name;
 	}
+	
 	public String getSymbol() {
 		return symbol;
 	}
+	
 	public void setSymbol(String symbol) {
 		this.symbol = symbol;
 	}
 	
-	public static double calculateRate(Double priceUSD, Double priceCurrency) {
-		if(priceCurrency > 0)
-			return priceUSD / priceCurrency;
+	public static float calculateRate(float rateOtherCurrency, float rateCurrentCurrency) {
+		if(rateCurrentCurrency > 0)
+			return rateOtherCurrency / rateCurrentCurrency;
 		else
-			return (double) -1;
+			return (float) -1;
 	}
+	
 	public boolean shouldUpdate() {
 		if(this.getDateExchange() != null) {
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern(Configuration.FORMAT_DATETIME);
@@ -78,10 +84,9 @@ public class Currency {
 			if(diff > 0) {
 				return true;
 			}	
-		}else {
-			return true;
 		}
-		return false;
+		
+		return (this.getDateExchange() == null);
 	}
 	
 }

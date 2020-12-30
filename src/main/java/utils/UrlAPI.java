@@ -1,7 +1,7 @@
 package utils;
 
 public enum UrlAPI {
-		  IP,
-		  COUNTRY,
-		  RATE
+	IP,
+	COUNTRY,
+	RATE
 }

@@ -18,20 +18,20 @@ public class MeliApplicationTests {
 
 	@Test
 	public void isNecesaryUpdateCurrencyObject() {
-		Currency currency = new Currency("ARS","Peso Argentino","$","2020-12-26", 0.1);
+		Currency currency = new Currency("ARS","Peso Argentino","$","2020-12-26", (float)0.1);
 		assertThat(currency.shouldUpdate()).isEqualTo(true);
 	}
 	
 	@Test
 	public void isNecesaryUpdateCurrencyObjectToday() {
 		String now = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
-		Currency currency = new Currency("ARS","Peso Argentino","$",now, 0.1);
+		Currency currency = new Currency("ARS","Peso Argentino","$",now, (float)0.1);
 		assertThat(currency.shouldUpdate()).isEqualTo(false);
 	}
 
 	@Test
 	public void checkCalculateExchageRate() {
-		float result = (float) Currency.calculateRate(1.2, 3.0);
+		float result = (float) Currency.calculateRate((float)1.2, (float)3.0);
 		assertThat(result).isEqualTo((float)0.4);
 	}
 	
@@ -42,7 +42,7 @@ public class MeliApplicationTests {
 		country.setLng(Configuration.LNG_COUNTRY_ORIGIN);
 		
 		country.setDistanceCalculated();
-		assertThat(country.getDistanceToArgentina()).isEqualTo(0);
+		assertThat(country.getDistanceToOtherPlace()).isEqualTo(0);
 	}
 	
 	@Test
@@ -52,7 +52,7 @@ public class MeliApplicationTests {
 		country.setLng(-35);
 		
 		country.setDistanceCalculated();
-		assertThat(country.getDistanceToArgentina()).isEqualTo(2761);
+		assertThat(country.getDistanceToOtherPlace()).isEqualTo(2249);
 	}
 	
 	@Test

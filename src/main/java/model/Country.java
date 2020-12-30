@@ -13,6 +13,7 @@ import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import com.google.gson.Gson;
 import utils.Configuration;
+
 @Entity
 @Table(name = "countries")
 @EntityListeners(AuditingEntityListener.class)
@@ -33,8 +34,8 @@ public class Country {
 	@Column(name = "flag", nullable = false)
 	private String flag;
 	
-	@Column(name = "distanceToArgentina", nullable = false)
-	private int distanceToArgentina;
+	@Column(name = "distanceToOtherPlace", nullable = false)
+	private int distanceToOtherPlace;
 	
 	@ElementCollection
 	private List<String> timezones;
@@ -46,13 +47,13 @@ public class Country {
 	private List<Currency> currencies;
 	
 	@Column(name = "lat", nullable = false)
-	private double lat;
+	private float lat;
 	
 	@Column(name = "lng", nullable = false)
-	private double lng;
+	private float lng;
 	
 	@Column(name = "requestCount", nullable = false)
-	private int requestCount = 1;
+	private long requestCount = 1;
 	
 	public Country() {
 		
@@ -66,41 +67,41 @@ public class Country {
 		this.name = country.name;
 		this.capital = country.capital;
 		this.flag = country.flag;
-		this.distanceToArgentina = country.distanceToArgentina;
+		this.distanceToOtherPlace = country.distanceToOtherPlace;
 		this.timezones = country.timezones;
 		this.languages = country.languages;
 		this.currencies = country.currencies;
 		JSONObject  jsonCountryResult = new JSONObject(json); 
 		if(jsonCountryResult.has("latlng")) {
 			JSONArray latlng = jsonCountryResult.getJSONArray("latlng");
-			this.setLatLngAndCalculate(latlng.getDouble(0),latlng.getDouble(1)) ;
+			this.setLatLngAndCalculate((float)latlng.getDouble(0),(float)latlng.getDouble(1)) ;
 		}
 	}
 	
-	public int getRequestCount() {
+	public long getRequestCount() {
 		return requestCount;
 	}
-	public void setRequestCount(int requestCount) {
+	public void setRequestCount(long requestCount) {
 		this.requestCount = requestCount;
 	}
-	public double getLat() {
+	public float getLat() {
 		return lat;
 	}
-	public void setLat(double lat) {
+	public void setLat(float lat) {
 		this.lat = lat;
 	}
-	public double getLng() {
+	public float getLng() {
 		return lng;
 	}
-	public void setLng(double lng) {
+	public void setLng(float lng) {
 		this.lng = lng;
 	}
 	
-	public int getDistanceToArgentina() {
-		return distanceToArgentina;
+	public int getDistanceToOtherPlace() {
+		return distanceToOtherPlace;
 	}
-	public void setDistanceToArgentina(int distanceToArgentina) {
-		this.distanceToArgentina = distanceToArgentina;
+	public void setDistanceToOtherPlace(int distanceToOtherPlace) {
+		this.distanceToOtherPlace = distanceToOtherPlace;
 	}
 
 	public List<String> getTimezones() {
@@ -182,19 +183,24 @@ public class Country {
 	     return queryCurrencies;
 	}
 	
-	public void setAllRates(JSONObject jsonRatesResult) throws JSONException {
-		Double priceUSD = jsonRatesResult.getJSONObject("rates").getDouble(Configuration.CURRENCY_CODE_TO_EXCHANGE);
-	     for(int i = 0; i < this.getCurrencies().size(); i++) {
-	    	 Double priceCurrentCurrency = (double) -1;
-	    	 if(jsonRatesResult.getJSONObject("rates").has(this.getCurrencies().get(i).getCode())) {
-		    	 priceCurrentCurrency = jsonRatesResult.getJSONObject("rates").getDouble(this.getCurrencies().get(i).getCode());
-	    	 }
-	    	 this.getCurrencies().get(i).setDateExchange(jsonRatesResult.getString("date"));
-	    	 this.getCurrencies().get(i).setExchangeRate(Currency.calculateRate(priceUSD,priceCurrentCurrency));
-	     }
+	public boolean setAllRates(JSONObject jsonRatesResult){
+		try {
+			float rateOtherCurrency = (float)jsonRatesResult.getJSONObject("rates").getDouble(Configuration.CURRENCY_CODE_TO_EXCHANGE);
+		     for(int i = 0; i < this.getCurrencies().size(); i++) {
+		    	 if(jsonRatesResult.getJSONObject("rates").has(this.getCurrencies().get(i).getCode())) {
+		    		 float rateCurrentCurrency;
+		    		 rateCurrentCurrency = (float)jsonRatesResult.getJSONObject("rates").getDouble(this.getCurrencies().get(i).getCode());
+			    	 this.getCurrencies().get(i).setDateExchange(jsonRatesResult.getString("date"));
+			    	 this.getCurrencies().get(i).setExchangeRate(Currency.calculateRate(rateOtherCurrency,rateCurrentCurrency));
+		    	 }
+		     }
+		     return true;
+		}catch (Exception e){
+			return false;
+		}
 	}
 	
-	public void setLatLngAndCalculate(double lat, double lng) {
+	public void setLatLngAndCalculate(float lat, float lng) {
 		this.setLat(lat);
 		this.setLng(lng);
 		this.setDistanceCalculated();
@@ -212,11 +218,11 @@ public class Country {
 	    double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
 	    float dist = (float) (earthRadius * c);
 
-	    this.distanceToArgentina = (int)dist;
+	    this.distanceToOtherPlace = (int)dist;
 	}
 	
-	public int calcToAverage() {
-		return this.distanceToArgentina * this.requestCount;
+	public long calcToAverage() {
+		return this.distanceToOtherPlace * this.requestCount;
 	}
 	
 	public boolean shouldUpdateRateCurrency(){

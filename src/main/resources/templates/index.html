@@ -57,13 +57,19 @@
             height: 200px;
             margin-top: 20px;
         }
+
+        .countryImg{
+            border:1px solid grey;
+            display:inline-block; 
+            height: 120px;
+        }
     </style>
 </head>
 
 <body>
     <div class="container">
         <div class="panelData">
-            <h1>Api geoMeli </h1>
+            <h1>ApiGeoMeli </h1>
             <div>
                 <div id="divError" style="display: none;"></div>
                 <div id="divSearching" style="display: none;">Buscando Datos...</div>
@@ -76,8 +82,7 @@
                 <div style="width:100%;text-align: center;margin-top: 20px;">
                     <div style="width:350px;display:inline-block;text-align: left;">
                         <div style="text-align: center;">
-                            <img id="imagen" src="" alt=""
-                                style="border:1px solid grey;display:inline-block; width: 200px;height: 120px">
+                            <img class="countryImg" id="image">
                         </div>
                         <div style="margin-top: 20px;">
                             <div>
@@ -117,7 +122,7 @@
                             </div>
 
                             <div>
-                                <label>Distancia estimada: </label>
+                                <label>Distancia estimada a Bs. As.: </label>
                                 <label id="distance" class="bold"></label>
                             </div>
                         </div>
@@ -127,9 +132,15 @@
             </div>
         </div>
     </div>
-    <small>v1.6</small>
+    <small>v3.0</small>
 </body>
 <script>
+    $("#ipAddress").keypress(function(event) { 
+            if (event.keyCode === 13) { 
+                generateRequest();
+            } 
+        }); 
+   
 
     var map = L.map('map', { zoomControl: false, scrollWheelZoom: false });
 
@@ -154,7 +165,7 @@
         document.getElementById("ip").innerHTML = "";
         document.getElementById("name").innerHTML = "";
         document.getElementById("capital").innerHTML = "";
-        document.getElementById("imagen").src = "";
+        document.getElementById("image").src = "";
         document.getElementById("IsoCode").innerHTML = "";
         document.getElementById("languages").innerHTML = "";
         document.getElementById("currencies").innerHTML = "";
@@ -186,8 +197,9 @@
                 var res = data.ip.country;
                 document.getElementById("ip").innerHTML = data.ip.ip;
                 document.getElementById("name").innerHTML = res.name;
+                document.getElementById("image").setAttribute("alt", `bandera de ${res.name}`)
                 document.getElementById("capital").innerHTML = res.capital;
-                document.getElementById("imagen").src = res.flag;
+                document.getElementById("image").src = res.flag;
                 document.getElementById("IsoCode").innerHTML = res.alpha2Code;
 
                 var lan = "";
@@ -210,7 +222,7 @@
 
                     mon += `${currency.symbol} (${currency.code} - ${currency.name})`;
                     if (currency.exchangeRate > 0) {
-                        cot += `1 ${currency.code} = ${currency.exchangeRate.toFixed(2)} USD <span style='color:grey;'> al ${currency.dateExchange} </span>`;
+                        cot += `1 ${currency.code} = ${currency.exchangeRate.toFixed(4)} USD <span style='color:grey;'> al ${currency.dateExchange} </span>`;
                     } else {
                         cot += `${currency.code} sin cotización`;
                     }
@@ -230,7 +242,7 @@
                     marker.remove();
                 }
 
-                document.getElementById("distance").innerHTML = `${res.distanceToArgentina} kms. (${res.lat}, ${res.lng})`;
+                document.getElementById("distance").innerHTML = `${res.distanceToOtherPlace} kms. (${res.lat}, ${res.lng})`;
                 marker = L.marker([res.lat, res.lng]).addTo(map)
                     .bindPopup('Aquí es <b>' + res.name + '</b>')
                     .openPopup();

@@ -87,7 +87,7 @@
 <body>
     <div class="container">
         <div class="panelData">
-            <h1>Estadística - Api geoMeli </h1>
+            <h1>Estadística - ApiGeoMeli </h1>
             <div>
                 <div id="divError">
                 </div>
@@ -101,11 +101,11 @@
                 <div id="container"></div>
                 <div style="width: 100%;">
                     <div id="divContainerMinDistance">
-                        <div>País con mínima distancia</div>
+                        <div>País con mínima distancia a Bs. As.</div>
                         <label id="lblMinDistance" class="bold"></label>
                     </div>
                     <div id="divContainerMaxDistance">
-                        <div>País con máxima distancia</div>
+                        <div>País con máxima distancia a Bs. As.</div>
                         <label id="lblMaxDistance" class="bold"></label>
                     </div>
                     <div id="divContainerAverageDistance">
@@ -161,7 +161,7 @@
                 success: function (data) {
                     if(data.success){
                         if(data.country != null)
-                        document.getElementById("lblMinDistance").innerHTML = `${data.country.name} (${data.country.distanceToArgentina} km.)`;
+                        document.getElementById("lblMinDistance").innerHTML = `${data.country.name} (${data.country.distanceToOtherPlace} km.)`;
                     }
                 }, error: function (err) {
                     document.getElementById("lblMinDistance").innerHTML = "No encontrado";
@@ -181,7 +181,7 @@
                 success: function (data) {
                     if(data.success){
                         if(data.country != null)
-                            document.getElementById("lblMaxDistance").innerHTML = `${data.country.name} (${data.country.distanceToArgentina} km.)`;
+                            document.getElementById("lblMaxDistance").innerHTML = `${data.country.name} (${data.country.distanceToOtherPlace} km.)`;
                     }
                 }, error: function (err) {
                     document.getElementById("lblMaxDistance").innerHTML = "No encontrado";
@@ -203,7 +203,7 @@
                         var series = new Array();
                         Array.from(data.countries).map(country => {
                             series.push(new Object({
-                                name: `${country.name} <br>(${country.distanceToArgentina} km.)`,
+                                name: `${country.name} <br>(${country.distanceToOtherPlace} km.)`,
                                 y: country.requestCount
                             }))
                         })

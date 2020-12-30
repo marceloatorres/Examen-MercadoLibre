@@ -1,8 +1,6 @@
 package api;
 
-import org.apache.tomcat.util.json.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -40,7 +38,7 @@ public class CountryController {
 		IResponse response;
 		try {
 			if(!Ip.isValid(ipAddress)) {
-				response = factoryResponse.getObjectResponse(TypeResponse.IP,false,"El ip ingresado es incorrecto",null); 
+				response = factoryResponse.getObjectResponse(TypeResponse.IP,false,"La dirección ip ingresada es incorrecta.",null); 
 				return objectMapper.writeValueAsString(response);
 			}
 			
@@ -49,8 +47,9 @@ public class CountryController {
 			String ipInformation = restTemplate.getForObject(externalApi.getUrl() + ipAddress, String.class); 
 			JSONObject  jsonIpResult = new JSONObject(ipInformation);
 			
+			//Verifico si no recibí datos de la Api externa
 			if(jsonIpResult.getString(Configuration.NAME_PROPERTY_COUNTRY_CODE).isEmpty()) {
-				response = factoryResponse.getObjectResponse(TypeResponse.IP,false,"El ip ingresado no se encontró",null);
+				response = factoryResponse.getObjectResponse(TypeResponse.IP,false,"La dirección ip ingresada no se encontró.",null);
 				return objectMapper.writeValueAsString(response);
 			}
 			
@@ -58,7 +57,7 @@ public class CountryController {
 			ip.getCountry().setAlpha3Code(jsonIpResult.getString(Configuration.NAME_PROPERTY_COUNTRY_CODE));
 			return getInfoCountry(ip);
 		}catch(Exception e){
-			response = factoryResponse.getObjectResponse(TypeResponse.IP,false,"Ocurrió un error al obtener la información de la dirección IP.",null);
+			response = factoryResponse.getObjectResponse(TypeResponse.IP,false,"Ocurrió un error al obtener información de la dirección ip ingresada.",null);
 			return objectMapper.writeValueAsString(response);
 		}
 		
@@ -67,7 +66,7 @@ public class CountryController {
 	public String getInfoCountry(Ip ip) throws Exception {
 		IResponse response;
 		try {
-			//Antes informacion del pais en la API externa lo busco en mi objecto singleto y en mi bd
+			//Antes informacion del pais en la API externa lo busco primero en mi objeto singleto sino en mi bd
 			SingletonCountry singletonCountry = SingletonCountry.getSingletonCountry();
 			Country country = null;
 			if(singletonCountry.getAllCountries() != null)
@@ -84,38 +83,57 @@ public class CountryController {
 			}else {
 				country.increaseRequestCount();
 			}
+			
 			ip.setCountry(country);
 			return calculateRateUSD(ip,countryFound); 
 		}catch(Exception e) {
-			response = factoryResponse.getObjectResponse(TypeResponse.IP,false,"Ocurrió un error al obtener la información del país.",null);
+			response = factoryResponse.getObjectResponse(TypeResponse.IP,false,"Ocurrió un error al obtener información del país.",null);
 			return objectMapper.writeValueAsString(response);
 		}
 	}
 	
-	public String calculateRateUSD(Ip ip, boolean countryFound) throws JsonProcessingException, ParseException, JSONException {
+	public String calculateRateUSD(Ip ip, boolean countryFound) throws JsonProcessingException{
 		IResponse response;
+		boolean updateRateSuccess = true;
 		try {
 			//Verifico que sea necesario actualizar las tarifas de cambio, si ya se consulto para el mismo dia utilizo el singleton
 			if(ip.getCountry().shouldUpdateRateCurrency()) {
 				externalApi.setUrl(UrlAPI.RATE);
 				String informationExchangeRate = restTemplate.getForObject(externalApi.getUrl() + ip.getCountry().createStringAllCurrencies(), String.class); 
 				JSONObject  jsonExchangeRatesResult = new JSONObject(informationExchangeRate); 
-				ip.getCountry().setAllRates(jsonExchangeRatesResult);
+				updateRateSuccess = ip.getCountry().setAllRates(jsonExchangeRatesResult);
 			}
 			
-			if(countryFound) {
-				countryService.updateCountry(ip.getCountry());
+			if(!updateRateSuccess) {
+				response = factoryResponse.getObjectResponse(TypeResponse.IP,false,"Ocurrió un error al actualizar el valor de cambio de moneda.",null);
+				return objectMapper.writeValueAsString(response);
+			}
+			
+			if(persistToDataBase(countryFound, ip.getCountry())) {
+				response = factoryResponse.getObjectResponse(TypeResponse.IP,true,"",ip);
 			}else {
-				countryService.saveCountry(ip.getCountry());	
+				response = factoryResponse.getObjectResponse(TypeResponse.IP,false,"Ocurrió un error en la persistencia de datos.",null);
 			}
 			
-			response = factoryResponse.getObjectResponse(TypeResponse.IP,true,"",ip);
 			return objectMapper.writeValueAsString(response);
 		}catch(Exception e) {
-			response = factoryResponse.getObjectResponse(TypeResponse.IP,false,"Ocurrió un error al calcular el valor de cambio de moneda.",null);
+			response = factoryResponse.getObjectResponse(TypeResponse.IP,false,"Ocurrió un error al obtener el valor de cambio de moneda.",null);
 			return objectMapper.writeValueAsString(response);
 		}
-		
+	}
+	
+	public boolean persistToDataBase(boolean countryFound, Country country) {
+		//Verificó si el país ya existía para actualizar, sino creo el nuevo registro
+		try {
+			if(countryFound) {
+				countryService.updateCountry(country);
+			}else {
+				countryService.saveCountry(country);	
+			}
+			return true;
+		}catch (Exception e){
+			return false;
+		}
 	}
 	
 }

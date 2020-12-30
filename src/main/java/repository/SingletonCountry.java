@@ -112,26 +112,26 @@ public class SingletonCountry {
 	public void calcMaxDistance() {
 		this.setMinDistanceCountry(this.getAllCountries()
 			      .stream()
-			      .max(Comparator.comparing(Country::getDistanceToArgentina))
+			      .max(Comparator.comparing(Country::getDistanceToOtherPlace))
 			      .orElseThrow(NoSuchElementException::new));
 	}
 	
 	public void calcMinDistance() {
 		this.setMinDistanceCountry(this.getAllCountries()
 			      .stream()
-			      .min(Comparator.comparing(Country::getDistanceToArgentina))
+			      .min(Comparator.comparing(Country::getDistanceToOtherPlace))
 			      .orElseThrow(NoSuchElementException::new));
 	}
 	
 	public void calcAverage() {
 		long TotalSum =	(long)this.getAllCountries()
 			            .stream()
-			            .mapToInt(Country::calcToAverage)
+			            .mapToLong(Country::calcToAverage)
 			            .sum() ;
 		
 		long totalRequestCount = (long)this.getAllCountries()
 					            .stream()
-					            .mapToInt(Country::getRequestCount)
+					            .mapToLong(Country::getRequestCount)
 					            .sum();
 		this.setAverageDistanceCountries(TotalSum / totalRequestCount);
 	}

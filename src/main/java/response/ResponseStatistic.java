@@ -20,6 +20,4 @@ public class ResponseStatistic extends Response implements IResponse{
 		this.countries = countries;
 	}
 	
-	
-	
 }

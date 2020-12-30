@@ -1,6 +1,5 @@
 package utils;
 public class ExternalApi {
-
 	private String url;
 	
 	public ExternalApi(UrlAPI url) {
@@ -9,14 +8,14 @@ public class ExternalApi {
 	
 	public String selectUrl(UrlAPI url) {
 		switch(url) {
-		case IP:
-			return "https://api.ip2country.info/ip?";
-		case COUNTRY:
-			return "https://restcountries.eu/rest/v2/alpha/";
-		case RATE:
-			return "http://data.fixer.io/api/latest?access_key=86bda81848f4b198301d4391c3a80227&symbols=" + Configuration.CURRENCY_CODE_TO_EXCHANGE + ",";
-		default:
-			return "";
+			case IP:
+				return Configuration.URL_API_IP;
+			case COUNTRY:
+				return Configuration.URL_API_COUNTRY;
+			case RATE:
+				return Configuration.URL_API_RATE_EXCHANGE;
+			default:
+				return "";
 		}
 	}
 	

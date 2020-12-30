@@ -14,9 +14,9 @@ public class AsyncConfiguration {
     public Executor taskExecutor() {
         final ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setCorePoolSize(2);
-        executor.setMaxPoolSize(2);
-        executor.setQueueCapacity(100);
-        executor.setThreadNamePrefix("CountryThread-");
+        executor.setMaxPoolSize(10);
+        executor.setQueueCapacity(Integer.MAX_VALUE);
+        executor.setThreadNamePrefix("ApiGeoMeliThread-");
         executor.initialize();
         return executor;
     }

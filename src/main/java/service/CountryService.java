@@ -21,6 +21,7 @@ public class CountryService implements ICountryService {
 	@Async
 	public List<Country> getAllCountries() {
 		SingletonCountry singletonCountry = SingletonCountry.getSingletonCountry();
+		//Verfico si no esta en el objecto singleton o si se actualizó hace mas del tiempo configurado.
 		if(singletonCountry.getAllCountries() == null || singletonCountry.shouldUpdate(singletonCountry.getLastUpdateAllCountries())) {
 			try {
 				singletonCountry.setAllCountries(countryRepository.findAll(Sort.by(Sort.Direction.DESC, "requestCount")));
@@ -58,6 +59,7 @@ public class CountryService implements ICountryService {
 	@Async
 	public Country getMax() {
 		SingletonCountry singletonCountry = SingletonCountry.getSingletonCountry();
+		//Verfico si no esta en el objecto singleton o si se actualizó hace mas del tiempo configurado.
 		if(singletonCountry.getMaxDistanceCountry() == null || singletonCountry.shouldUpdate(singletonCountry.getLastUpdateMaxDistance())) {
 			try {
 				singletonCountry.setMaxDistanceCountry(countryRepository.findMax());
@@ -74,7 +76,7 @@ public class CountryService implements ICountryService {
 	@Async
 	public Country getMin() {
 		SingletonCountry singletonCountry = SingletonCountry.getSingletonCountry();
-		//Verfico si esta en el objecto singleton menos del tiempo configurado
+		//Verfico si no esta en el objecto singleton o si se actualizó hace mas del tiempo configurado.
 		if(singletonCountry.getMinDistanceCountry() == null || singletonCountry.shouldUpdate(singletonCountry.getLastUpdateMinDistance())) {
 			try {
 				singletonCountry.setMinDistanceCountry(countryRepository.findMin());
@@ -91,6 +93,7 @@ public class CountryService implements ICountryService {
 	@Async
 	public long distanceAverage(){
 		SingletonCountry singletonCountry = SingletonCountry.getSingletonCountry();
+		//Verfico si no esta en el objecto singleton o si se actualizó hace mas del tiempo configurado.
 		if(singletonCountry.getAverageDistanceCountries() == 0 || singletonCountry.shouldUpdate(singletonCountry.getLastUpdateAverage())) {
 			try {
 				singletonCountry.setAverageDistanceCountries(countryRepository.distanceAverage());

@@ -131,7 +131,7 @@
 
         function getDistanceAverage() {
             $.ajax({
-                url: "http://localhost:8080/api/stats/average",
+                url: "/api/stats/average",
                 method: "POST",
                 timeout: 0,
                 dataType: "json",
@@ -151,7 +151,7 @@
 
         function getCountryMinDistance() {
             $.ajax({
-                url: "http://localhost:8080/api/stats/min",
+                url: "/api/stats/min",
                 method: "POST",
                 timeout: 0,
                 dataType: "json",
@@ -171,7 +171,7 @@
 
         function getCountryMaxDistance() {
             $.ajax({
-                url: "http://localhost:8080/api/stats/max",
+                url: "/api/stats/max",
                 method: "POST",
                 timeout: 0,
                 dataType: "json",
@@ -191,7 +191,7 @@
 
         function generateStatistic() {
             $.ajax({
-                url: "http://localhost:8080/api/stats",
+                url: "/api/stats",
                 method: "POST",
                 timeout: 0,
                 dataType: "json",

@@ -4,11 +4,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import model.Country;
 import repository.CountryRepository;
-
 import repository.SingletonCountry;
 
 @Service
@@ -16,9 +14,7 @@ public class CountryService implements ICountryService {
 
 	@Autowired
 	private CountryRepository countryRepository;
-	
 	@Override
-	@Async
 	public List<Country> getAllCountries() {
 		SingletonCountry singletonCountry = SingletonCountry.getSingletonCountry();
 		//Verfico si no esta en el objecto singleton o si se actualizó hace mas del tiempo configurado.
@@ -39,13 +35,8 @@ public class CountryService implements ICountryService {
 	}
 
 	@Override
-	public Country updateCountry(Country country) {
-		Country updatedCountry = new Country();
-			if(country == null) {
-				return null;
-			}
-			updatedCountry = countryRepository.save(country);
-		return updatedCountry;
+	public int updateRequestCount(String alpha3Code) {
+		return countryRepository.updateRequestCount(alpha3Code);
 	}
 	
 	@Override
@@ -56,7 +47,6 @@ public class CountryService implements ICountryService {
 	}
 
 	@Override
-	@Async
 	public Country getMax() {
 		SingletonCountry singletonCountry = SingletonCountry.getSingletonCountry();
 		//Verfico si no esta en el objecto singleton o si se actualizó hace mas del tiempo configurado.
@@ -73,7 +63,6 @@ public class CountryService implements ICountryService {
 	}
 	
 	@Override
-	@Async
 	public Country getMin() {
 		SingletonCountry singletonCountry = SingletonCountry.getSingletonCountry();
 		//Verfico si no esta en el objecto singleton o si se actualizó hace mas del tiempo configurado.
@@ -90,7 +79,6 @@ public class CountryService implements ICountryService {
 	}
 	
 	@Override
-	@Async
 	public long distanceAverage(){
 		SingletonCountry singletonCountry = SingletonCountry.getSingletonCountry();
 		//Verfico si no esta en el objecto singleton o si se actualizó hace mas del tiempo configurado.

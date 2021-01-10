@@ -2,6 +2,7 @@ package api;
 
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,7 +26,8 @@ public class StatisticsController {
 	FactoryResponse factoryResponse = new FactoryResponse();
 	
 	@PostMapping
-	public String getRequest() throws JsonProcessingException {
+	@Async("taskExecutor")
+	public String getCountriesRanking() throws JsonProcessingException {
 		IResponse response;
 		try {
 			List<Country> countries = countryService.getAllCountries();
@@ -37,6 +39,7 @@ public class StatisticsController {
 	}
 
 	@PostMapping("/average")
+	@Async("taskExecutor")
 	public String average() throws JsonProcessingException {
 		IResponse response;
 		try {
@@ -49,6 +52,7 @@ public class StatisticsController {
 	}
 	
 	@PostMapping("/max")
+	@Async("taskExecutor")
 	public String max() throws JsonProcessingException {
 		IResponse response;
 		try {
@@ -61,6 +65,7 @@ public class StatisticsController {
 	}
 	
 	@PostMapping("/min")
+	@Async("taskExecutor")
 	public String min() throws JsonProcessingException {
 		IResponse response;
 		try {

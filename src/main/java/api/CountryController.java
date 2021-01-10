@@ -1,7 +1,9 @@
 package api;
 
+import java.util.concurrent.locks.ReentrantLock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,6 +28,7 @@ public class CountryController {
 	ExternalApi externalApi = new ExternalApi(UrlAPI.IP);
 	RestTemplate restTemplate = new RestTemplate();
 	FactoryResponse factoryResponse = new FactoryResponse();
+	private ReentrantLock mutexToPersist = new ReentrantLock();
 	
 	@Autowired
     private ObjectMapper objectMapper;
@@ -34,7 +37,8 @@ public class CountryController {
   	private ICountryService countryService;
 	
 	@PostMapping("/info")
-	public String getRequest(@RequestBody String ipAddress) throws Exception {
+	@Async("taskExecutor")
+	public String getIpInformation(@RequestBody String ipAddress) throws Exception {
 		IResponse response;
 		try {
 			if(!Ip.isValid(ipAddress)) {
@@ -80,8 +84,6 @@ public class CountryController {
 				externalApi.setUrl(UrlAPI.COUNTRY);
 				String informationCountry = restTemplate.getForObject(externalApi.getUrl() + ip.getCountry().getAlpha3Code(), String.class);
 				country = new Country(informationCountry);
-			}else {
-				country.increaseRequestCount();
 			}
 			
 			ip.setCountry(country);
@@ -123,15 +125,26 @@ public class CountryController {
 	}
 	
 	public boolean persistToDataBase(boolean countryFound, Country country) {
-		//Verificó si el país ya existía para actualizar, sino creo el nuevo registro
 		try {
+			//Verificó si el país ya existía para actualizar, sino creo el nuevo registro.
 			if(countryFound) {
-				countryService.updateCountry(country);
+				countryService.updateRequestCount(country.getAlpha3Code());
 			}else {
-				countryService.saveCountry(country);	
+				mutexToPersist.lock();
+				Country countryAux;
+				countryAux = countryService.getCountryByAlphaCode(country.getAlpha3Code());
+						
+				if(countryAux == null)
+					countryService.saveCountry(country);
+				else
+					countryService.updateRequestCount(country.getAlpha3Code());
+				
+				mutexToPersist.unlock();
 			}
 			return true;
 		}catch (Exception e){
+			if(mutexToPersist.isLocked())
+				mutexToPersist.unlock();
 			return false;
 		}
 	}

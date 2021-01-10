@@ -81,18 +81,23 @@ public class Country {
 	public long getRequestCount() {
 		return requestCount;
 	}
+	
 	public void setRequestCount(long requestCount) {
 		this.requestCount = requestCount;
 	}
+	
 	public float getLat() {
 		return lat;
 	}
+	
 	public void setLat(float lat) {
 		this.lat = lat;
 	}
+	
 	public float getLng() {
 		return lng;
 	}
+	
 	public void setLng(float lng) {
 		this.lng = lng;
 	}
@@ -166,10 +171,6 @@ public class Country {
 	
 	public void setAlpha3Code(String alpha3Code) {
 		this.alpha3Code = alpha3Code;
-	}
-	
-	public void increaseRequestCount() {
-		this.requestCount +=1;
 	}
 	
 	public String createStringAllCurrencies() {

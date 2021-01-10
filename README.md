@@ -22,10 +22,10 @@ Body: `5.6.7.8` (ó cualquier dirección de ipv4)
 <b>Obtener información respecto al historial de consultas realizadas</b><br>
 url: `http://localhost:8080/api/stats`
 
-<b>Obtener información del país consultado mas alejado de Argentina.</b><br>
+<b>Obtener información del país consultado mas alejado de Bs.As.</b><br>
 url: `http://localhost:8080/api/stats/max`
 
-<b>Obtener información del país consultado mas cercano de Argentina.</b><br>
+<b>Obtener información del país consultado mas cercano de Bs.As.</b><br>
 url: `http://localhost:8080/api/stats/min`
 
 <b>Promedio de distancias consultadas</b><br>

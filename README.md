@@ -1,8 +1,12 @@
 # Challenge Mercadolibre
 ApiGeoMeli es una aplicación para obtener información desde una dirección ip de cualquier parte del mundo. Además, realiza la persistencia de datos de todas las consultas realizadas con el fin de confieccionar un historial con información útil para ser utilizado a modo estadístico. De éste historial, se podrá conocer información del país mas lejano y el mas cercano de Argentina, el promedio de distancias y un informe más completo con información mas detallada de todos los países.
 
-Para poder utlizar ApiGeoMeli, deberá descargar este repositorio y desde una consola bash ejecutar `./start.sh`<br>
-Será necesario contar con Maven y Docker previamente instalados para su correcta ejecución <i>(probado con Maven  3.6.3)</i>.
+Para poder utlizar ApiGeoMeli, deberás descargar este repositorio y desde una consola bash ejecutar `./start.sh`<br>
+<i>(será necesario contar con Maven y Docker previamente instalados para su correcta ejecución).</i> <br>
+
+Si necesitás instalar Maven, podés hacerlo ejecutando el siguiente comando: `brew install maven` <br>
+
+Si necesitas descargar Docker, podés hacerlo desde la siguiente url: `https://www.docker.com/get-started`<br>
 
 Para iniciar, abrir el navegador, ingresar a `http://localhost:8080` y listo!
 
